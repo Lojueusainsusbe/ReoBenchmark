@@ -1,0 +1,17 @@
+import reo.fifo1;
+import reo.fifofull;
+import reo.sync;
+import reo.syncdrain;
+
+Nsequencer<N:int>(p[1..N]?) {
+	{
+  		fifo1(x[i], x[i+1])
+		syncdrain(x[i+1], p[i])
+	| 
+    	i : <2..N>
+  	}
+
+	fifofull<"0">(x[1], x[2])
+	syncdrain(x[2],p[1])
+	sync(x[N+1], x[1])
+}
