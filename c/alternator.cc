@@ -4,6 +4,7 @@
 #include<chrono>
 #include<thread>
 
+/*
 class Producer {
 	public:
 		Producer() {}
@@ -82,8 +83,11 @@ class Alternate() {
 		int prodCount;
 }
 
+*/
+
 
 int main(int argc, char** argv) {
+	/*
 	if(argc < 2) { std::cout << "Give a number of producers" << std::endl; return -1; }
 	int N = strtol(argv[1], NULL, 10);
 
@@ -105,4 +109,5 @@ int main(int argc, char** argv) {
 		threads[i]->join();
 	}	
 
+	*/
 }

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [[ $1 == "clean" ]]; then
+	for i in *.cc; do		
+		name=$(echo $i | tr "." "\n" | head -n 1)
+		echo "Removing $name"
+		rm -f $name
+	done
+
+	exit
+fi
+
+for i in *.cc; do
+	name=$(echo $i | tr "." "\n" | head -n 1)
+	echo "Compiling $i"
+	g++ -Wall -Wextra -pthread $i -o $name
+done

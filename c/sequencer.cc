@@ -4,36 +4,62 @@
 #include<chrono>
 #include<thread>
 
+class Sequence {
+	public:
+		Sequence(int num) {
+			N = num;
+			
+			// Create mutexes
+			locks = (std::mutex**) malloc(N * sizeof(std::mutex*));
+			for(int i = 0; i < N; i++) {
+				locks[i] = new std::mutex;
+
+				// Lock all except first
+				if(i != 0) {
+					locks[i]->lock();
+				}
+			}
+		}
+
+		// Producer id does a put on the protocol
+		void put(int id, int data) {
+			// Try to acquire your own lock
+			locks[id]->lock();
+			
+			std::cout << id << " is now producing" << std::endl;
+			buff = data;
+			locks[(id+1)%N]->unlock();
+		}
+
+		// This protocol does not have outputs
+		void get() {}
+	private:
+		std::mutex** locks;
+		int N;
+		int buff;
+};
+
 
 class Producer {
 	public:
 		Producer() {}
-		void setMembers(int i, std::mutex* l, int pc, int* b) {
+		void setMembers(int i, Sequence* s) {
 			id = i;
-			locks = l;
-			prodCount = pc;
-			buff = b;
+			seq = s;
 		}
 
 		void produce() {
 			// Randomize when consumers start
-			std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%prodCount)));
+			std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
 			while(true) {
 				// Production
-				locks[id].lock();
-				std::cout << id << " is now producing" << std::endl;
-				*buff = rand();
-				
-				// Unluck so the next can produce
-				locks[(id+1)%prodCount].unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(20));
+				seq->put(id, rand());
+				std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
 			}
 		}
 	private:
 		int id;
-		std::mutex* locks;
-		int prodCount;
-		int* buff;
+		Sequence* seq;
 };
 
 
@@ -41,16 +67,13 @@ int main(int argc, char** argv) {
 	if(argc < 2) { std::cout << "Give a number of producers" << std::endl; return -1; }
 	int N = strtol(argv[1], NULL, 10);
 
-	int buff;
 	Producer producers[N];
-	std::mutex locks[N];
-	// Lock all except first
-	for(int i = 1; i < N; i++) locks[i].lock();	
+	Sequence seq(N);
 
 	// Start producing
 	std::thread** threads = (std::thread**) malloc(N*sizeof(std::thread*));
 	for(int i = 0; i < N; i++) {
-		producers[i].setMembers(i, &locks[0], N, &buff);
+		producers[i].setMembers(i, &seq);
 		threads[i] = new std::thread(&Producer::produce, &producers[i]);
 	}
 
