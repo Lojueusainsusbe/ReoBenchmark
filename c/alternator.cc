@@ -4,110 +4,143 @@
 #include<chrono>
 #include<thread>
 
-/*
-class Producer {
-	public:
-		Producer() {}
-		void setMembers(int i, std::mutex* l, int pc, int* b) {
-			id = i;
-			locks = l;
-			prodCount = pc;
-			buff = b;
-		}
 
-		void produce() {
-			// Randomize when consumers start
-			std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%prodCount)));
-			while(true) {
-				// Production
-				locks[id].lock();
-				std::cout << id << " is now producing" << std::endl;
-				*buff = rand();
-				
-				// Unluck so the next can produce
-				locks[(id+1)%prodCount].unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(20));
-			}
-		}
-	private:
-		int id;
-		std::mutex* locks;
-		int prodCount;
-		int* buff;
-};
-
-class Alternate() {
+class Alternate {
 	public:
 		Alternate(int n) {
-			prodCount = n;
-			locks = (std::mutex*) malloc(prodCount*sizeof(std::mutex));
-			for(int i = 0; i < prodCount; i++) {
+			actors = n+1;
+			locks = (std::mutex**) malloc((actors-1)*sizeof(std::mutex*));
+			for(int i = 0; i < actors-1; i++) {
 				locks[i] = new std::mutex;
-				locks[i].lock();
+				locks[i]->lock();
 			}
 			tried = 0;
-			got = false;
+			dataidx = 0;
+			data = (int*) malloc(sizeof(int));
+		}
+
+		void announceArrival() {	
+			triedlock.lock();
+			tried++;
+			if(tried == actors) {
+				unlock_all();
+			}
+			triedlock.unlock();
+		}
+
+		void announceDeparture() {	
+			triedlock.lock();
+			tried--;
+			triedlock.unlock();
 		}
 
 		// Corresponds to Reo putter
 		void put(int id, int d) {
-			tried++;
-			if(tried == prodCount && got) {
-				unlock_all();
-			}
-			
-			locks[id].lock();
+			announceArrival();
+
+			locks[id]->lock();
 			data[id] = d;
+		
+			announceDeparture();
+			locks[id]->unlock();
 		}
 
 
 		// Corresponds to Reo getter
 		int get() {
-			got = true;
-
-			
+			announceArrival();
+			int dat = data[dataidx++];
+			if(dataidx == actors-2) {
+				//reset
+				dataidx = 0;
+			}
+				
+			announceDeparture();
+			return dat;	
 		}
 
 
 		void unlock_all() {
-			for(int i = 0; i < prodCount; i++) {
-				locks[i].unlock();
+			for(int i = 0; i < actors-1; i++) {
+				locks[i]->unlock();
 			}
+			tried = 0;
 		}
 	private:
+		std::mutex triedlock;
 		int tried;
-		bool got;
-		std::mutex getlock;
 		int* data;
-		std::mutex* locks;
-		int prodCount;
-}
+		int dataidx;
+		std::mutex** locks;
+		int actors;
+};
 
-*/
+
+class Producer {
+	public:
+		Producer() {}
+		void setMembers(int i, Alternate* a) {
+			id = i;
+			alt = a;
+		}
+
+		void produce() {
+			// Randomize when consumers start
+			std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
+			while(true) {
+				alt->put(id, rand());	
+				std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
+			}
+		}
+
+	private:
+		int id;
+		Alternate* alt;
+};
+
+
+class Consumer {
+	public:
+		Consumer() {}
+		void setMembers(Alternate* a) {
+			alt = a;
+		}
+
+		void consume() {
+			while(true) {
+				int data = alt->get();
+				std::cout << data << std::endl;
+				std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
+			}	
+		}
+	private:
+		Alternate* alt;
+};
 
 
 int main(int argc, char** argv) {
-	/*
 	if(argc < 2) { std::cout << "Give a number of producers" << std::endl; return -1; }
 	int N = strtol(argv[1], NULL, 10);
 
-	int buff;
 	Producer producers[N];
-	std::mutex locks[N];
-	// Lock all except first
-	for(int i = 1; i < N; i++) locks[i].lock();	
+	Consumer consumer;
+	Alternate alt(N);
 
 	// Start producing
 	std::thread** threads = (std::thread**) malloc(N*sizeof(std::thread*));
 	for(int i = 0; i < N; i++) {
-		producers[i].setMembers(i, &locks[0], N, &buff);
+		producers[i].setMembers(i, &alt);
 		threads[i] = new std::thread(&Producer::produce, &producers[i]);
 	}
 
+	// Start consuming
+	consumer.setMembers(&alt);
+	std::thread* conthread = new std::thread(&Consumer::consume, &consumer);	
+
 	// Join all the threads
+	conthread->join();
 	for(int i = 0; i < N; i++) {	
 		threads[i]->join();
 	}	
 
-	*/
 }
