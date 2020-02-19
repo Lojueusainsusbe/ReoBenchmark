@@ -138,7 +138,6 @@ class Consumer {
 			while(true) {
 				int data = alt->get();
 				std::cout << data << std::endl;
-				//log(std::to_string(data));
 				std::this_thread::sleep_for(std::chrono::milliseconds(2*(rand()%50)));
 			}	
 		}
