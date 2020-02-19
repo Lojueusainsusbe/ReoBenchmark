@@ -3,31 +3,40 @@
 #include<iostream>
 #include<chrono>
 #include<thread>
-
+#include <string>
 
 class Alternate {
 	public:
 		Alternate(int n) {
-			actors = n+1;
+			// Allocate stuff
 			locks = (std::mutex**) malloc((actors-1)*sizeof(std::mutex*));
 			for(int i = 0; i < actors-1; i++) {
 				locks[i] = new std::mutex;
 				locks[i]->lock();
 			}
+			data = (int*) malloc(sizeof(int));
+			
+			// Init members
+			actors = n+1;
 			tried = 0;
 			dataidx = 0;
-			data = (int*) malloc(sizeof(int));
+			firstlock.lock();
+			accepting = true;
 		}
 
-		void announceArrival() {	
+		// Mutex functions to increment and decrement a counter that is used to see
+		// if all prods and the con have accessed the alternator
+		void announceArrival(int id) {
 			triedlock.lock();
 			tried++;
+
+			// All parties go at once in an alternator
 			if(tried == actors) {
 				unlock_all();
 			}
+			
 			triedlock.unlock();
 		}
-
 		void announceDeparture() {	
 			triedlock.lock();
 			tried--;
@@ -36,38 +45,57 @@ class Alternate {
 
 		// Corresponds to Reo putter
 		void put(int id, int d) {
-			announceArrival();
+			announceArrival(id);
 
 			locks[id]->lock();
 			data[id] = d;
+			locks[id]->unlock();
+			
+			if(id == 0) {
+				firstlock.unlock();
+			}
 		
 			announceDeparture();
-			locks[id]->unlock();
 		}
-
 
 		// Corresponds to Reo getter
 		int get() {
-			announceArrival();
-			int dat = data[dataidx++];
-			if(dataidx == actors-2) {
-				//reset
-				dataidx = 0;
+			// Only announce arrival when not in emptying phase
+			if(accepting) {
+				announceArrival(-1);
 			}
-				
+
+			// Make sure the first item is accessed after it is written to
+			if(dataidx == 0) {
+				firstlock.lock();
+			}
+	
+			log("Consumer taking data item " + std::to_string(dataidx));
+			int dat = data[dataidx++];
+
+			// All the items have left the alternator	
+			if(dataidx == actors-1) {
+				log("All items got, resetting");
+				dataidx = 0;
+				accepting = true;
+			}
+			
 			announceDeparture();
 			return dat;	
 		}
 
 
 		void unlock_all() {
+			log("Unlocking all");
 			for(int i = 0; i < actors-1; i++) {
 				locks[i]->unlock();
 			}
-			tried = 0;
+			accepting = false;
 		}
 	private:
+		bool accepting;
 		std::mutex triedlock;
+		std::mutex firstlock;
 		int tried;
 		int* data;
 		int dataidx;
@@ -88,8 +116,8 @@ class Producer {
 			// Randomize when consumers start
 			std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
 			while(true) {
-				alt->put(id, rand());	
-				std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
+				alt->put(id, id);	
+				std::this_thread::sleep_for(std::chrono::milliseconds(200*(rand()%50)));
 			}
 		}
 
@@ -110,7 +138,8 @@ class Consumer {
 			while(true) {
 				int data = alt->get();
 				std::cout << data << std::endl;
-				std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
+				//log(std::to_string(data));
+				std::this_thread::sleep_for(std::chrono::milliseconds(2*(rand()%50)));
 			}	
 		}
 	private:
