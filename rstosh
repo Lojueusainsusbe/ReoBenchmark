@@ -1,0 +1,22 @@
+#!/bin/bash
+
+SRCNAME=$(echo $1 | tr "." "\n" | head -n 1)
+
+mkdir __skellycrate
+mkdir __skellycrate/src
+
+TOML=$'[package]\nname = "temp"\nversion = "0.1.0"\nedition = "2018"\n\n[lib]\ncrate-type = ["cdylib"]\n\n[dependencies]\nmaplit = "1.0.1"\nreo_rs = { git = "https://github.com/sirkibsirkib/reo_rs" }\n'
+echo "$TOML" > ./__skellycrate/Cargo.toml
+
+cp ./$SRCNAME.rs ./__skellycrate/src/lib.rs -f
+
+cd __skellycrate
+
+cargo +nightly build --release
+
+cd ..
+cp ./__skellycrate/target/release/libtemp.so "./$SRCNAME.so"
+
+rm ./__skellycrate -rf
+
+
