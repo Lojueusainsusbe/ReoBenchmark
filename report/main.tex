@@ -23,8 +23,18 @@
 
 \section{Implementation}
 \subsection{Protocol 1: Sequencer}
+
 \subsection{Protocol 2: Repeater}
+A repeater is a simple program with one producer and one consumer. 
+Every item that is produced is copied $k-1$ times.
+The next item can only be produced after the first item has been consumed $k$ times.
+\subsubsection{Reo}
+
+\subsubsection{C++} %wellicht een tikkeltje te uitgebreidt?
+The C++ version of protocol 2 consists of a mutex $p$ for the producer and a mutex $c$ for the consumer as well as a counter. Data can only be put when $p$ can be acquired. After a succesfull put, the counter is set to $k$ and $c$ is released. This enables the get function to acquire $c$. For every get, the count is decreased by one. The get function releases $c$ after each successful get while the counter $> 0$, which enables another get. When the counter equals 0, $p$ is released, which enables a new put, while $c$ is not released, which prevents any new gets until a put is made.
+
 \subsection{Protocol 3: Alternator}
+
 \subsection{Protocol 4: Exclusive Router}
 
 \section{Experiments}
