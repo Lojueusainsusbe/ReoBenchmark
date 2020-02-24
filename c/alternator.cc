@@ -3,30 +3,47 @@
 #include<iostream>
 #include<chrono>
 #include<thread>
-#include <string>
+#include<string>
+#include<pthread.h>
+
+int actions = 0;
+std::chrono::time_point<std::chrono::high_resolution_clock> tstart;
+std::chrono::time_point<std::chrono::high_resolution_clock> tend;
+
+
+std::mutex logmutex;
+void log(std::string text) {
+	logmutex.lock();
+	std::cout << text << std::endl;
+	logmutex.unlock();
+}
+
 
 class Alternate {
 	public:
 		Alternate(int n) {
 			// Allocate stuff
-			locks = (std::mutex**) malloc((actors-1)*sizeof(std::mutex*));
+			actors = n+1;
+			locks = (pthread_mutex_t**) malloc((actors-1)*sizeof(pthread_mutex_t*));
 			for(int i = 0; i < actors-1; i++) {
-				locks[i] = new std::mutex;
-				locks[i]->lock();
+				locks[i] = new pthread_mutex_t;
+				*locks[i] = PTHREAD_MUTEX_INITIALIZER;
 			}
 			data = (int*) malloc(sizeof(int));
 			
 			// Init members
-			actors = n+1;
 			tried = 0;
+			putted = 0;
 			dataidx = 0;
-			firstlock.lock();
-			accepting = true;
+			alltried = PTHREAD_COND_INITIALIZER;
+			allput = PTHREAD_COND_INITIALIZER;
+			allputlock = PTHREAD_MUTEX_INITIALIZER;
 		}
 
 		// Mutex functions to increment and decrement a counter that is used to see
 		// if all prods and the con have accessed the alternator
 		void announceArrival(int id) {
+			log(std::to_string(id) + " announced arrival");
 			triedlock.lock();
 			tried++;
 
@@ -42,18 +59,32 @@ class Alternate {
 			tried--;
 			triedlock.unlock();
 		}
+		void announcePut() {
+			putlock.lock();
+			putted++;
+		
+			log("PUT: " + std::to_string(putted));
+
+			// All data is consumed when it is all put
+			if(putted == actors) {
+				pthread_cond_signal(&allput);
+			}
+
+			putlock.unlock();	
+		}
 
 		// Corresponds to Reo putter
 		void put(int id, int d) {
 			announceArrival(id);
 
-			locks[id]->lock();
-			data[id] = d;
-			locks[id]->unlock();
-			
-			if(id == 0) {
-				firstlock.unlock();
-			}
+			pthread_mutex_lock(locks[id]);
+			pthread_cond_wait(&alltried, locks[id]);
+
+			log(std::to_string(id) + " now entering critical section");
+			data[id] = d;	
+			announcePut();
+
+			pthread_mutex_unlock(locks[id]);
 		
 			announceDeparture();
 		}
@@ -61,23 +92,25 @@ class Alternate {
 		// Corresponds to Reo getter
 		int get() {
 			// Only announce arrival when not in emptying phase
-			if(accepting) {
+			if(dataidx == 0) {
 				announceArrival(-1);
 			}
 
-			// Make sure the first item is accessed after it is written to
+			// Make sure the items ire accessed after they are written to
 			if(dataidx == 0) {
-				firstlock.lock();
+				pthread_mutex_lock(&allputlock);
+				pthread_cond_wait(&allput, &allputlock);
+				pthread_mutex_unlock(&allputlock);
 			}
 	
-			log("Consumer taking data item " + std::to_string(dataidx));
 			int dat = data[dataidx++];
+			putlock.lock();
+			putted--;
+			putlock.unlock();
 
 			// All the items have left the alternator	
 			if(dataidx == actors-1) {
-				log("All items got, resetting");
 				dataidx = 0;
-				accepting = true;
 			}
 			
 			announceDeparture();
@@ -86,20 +119,22 @@ class Alternate {
 
 
 		void unlock_all() {
-			log("Unlocking all");
-			for(int i = 0; i < actors-1; i++) {
-				locks[i]->unlock();
-			}
-			accepting = false;
+			log("now broadcasting");
+			pthread_cond_broadcast(&alltried);
 		}
+
 	private:
-		bool accepting;
-		std::mutex triedlock;
-		std::mutex firstlock;
+		pthread_cond_t alltried; 
+		pthread_cond_t allput;
 		int tried;
+		int putted;
+		pthread_mutex_t allputlock;
+		
+		std::mutex triedlock;
+		std::mutex putlock;
 		int* data;
 		int dataidx;
-		std::mutex** locks;
+		pthread_mutex_t** locks;
 		int actors;
 };
 
@@ -113,12 +148,10 @@ class Producer {
 		}
 
 		void produce() {
-			// Randomize when consumers start
-			std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
-			while(true) {
+			while(actions != 0) {
 				alt->put(id, id);	
-				std::this_thread::sleep_for(std::chrono::milliseconds(200*(rand()%50)));
 			}
+			exit(0);
 		}
 
 	private:
@@ -135,11 +168,17 @@ class Consumer {
 		}
 
 		void consume() {
-			while(true) {
+			while(actions >= 0) {
 				int data = alt->get();
-				std::cout << data << std::endl;
-				std::this_thread::sleep_for(std::chrono::milliseconds(2*(rand()%50)));
-			}	
+				log("DATA: " + std::to_string(data));
+				actions--;
+			}
+
+			tend = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double> diff = tend-tstart;
+
+			std::cout << diff.count() << std::endl;
+			exit(0);
 		}
 	private:
 		Alternate* alt;
@@ -147,8 +186,9 @@ class Consumer {
 
 
 int main(int argc, char** argv) {
-	if(argc < 2) { std::cout << "Give a number of producers" << std::endl; return -1; }
+	if(argc < 3) { std::cout << "Give a number of producers and an action count" << std::endl; return -1; }
 	int N = strtol(argv[1], NULL, 10);
+	actions = strtol(argv[2], NULL, 10);
 
 	Producer producers[N];
 	Consumer consumer;
@@ -156,6 +196,8 @@ int main(int argc, char** argv) {
 
 	// Start producing
 	std::thread** threads = (std::thread**) malloc(N*sizeof(std::thread*));
+	tstart = std::chrono::high_resolution_clock::now();
+	
 	for(int i = 0; i < N; i++) {
 		producers[i].setMembers(i, &alt);
 		threads[i] = new std::thread(&Producer::produce, &producers[i]);

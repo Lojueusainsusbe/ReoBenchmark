@@ -2,7 +2,7 @@
 interactions=$1
 declare -a sizes=("4" "16" "64" "256" "512" "1024")
 runs=5
-
+actions=2000000
 
 
 for i in treo/*; do
@@ -31,9 +31,9 @@ for i in treo/*; do
 		# Collect CPU cycles and runtime stats
 		for run in [0..$runs]; do
 			# Run C code and save stdout (interactions per second)
-			cstats=$(perf stat c/$name 2>&1 >/dev/null | grep -E "task-clock | cycles  " | awk '{ print $1 }')
+			cstats=$(perf stat c/$name $runs $actions 2>&1 >/dev/null | grep -E "task-clock | cycles  " | awk '{ print $1 }')
 			# Run Reo code and save stdout (interactions per second)
-			tstats=$(perf stat treo/$name 2>&1 >/dev/null | grep -E "task-clock | cycles  " | awk '{ print $1 }')
+			tstats=$(perf stat treo/$name $runs $actions 2>&1 >/dev/null | grep -E "task-clock | cycles  " | awk '{ print $1 }')
 
 			#Save those times, or make graph or somethign idk
 		done
