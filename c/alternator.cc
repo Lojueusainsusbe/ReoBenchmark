@@ -35,7 +35,9 @@ class Alternate {
 			tried = 0;
 			putted = 0;
 			dataidx = 0;
+
 			alltried = PTHREAD_COND_INITIALIZER;
+
 			allput = PTHREAD_COND_INITIALIZER;
 			allputlock = PTHREAD_MUTEX_INITIALIZER;
 		}
@@ -46,10 +48,11 @@ class Alternate {
 			log(std::to_string(id) + " announced arrival");
 			triedlock.lock();
 			tried++;
+			log("TRIED: " + std::to_string(tried));
 
 			// All parties go at once in an alternator
-			if(tried == actors) {
-				unlock_all();
+			if(tried == actors && putted == 0) {
+				unlock_all(id);
 			}
 			
 			triedlock.unlock();
@@ -66,7 +69,7 @@ class Alternate {
 			log("PUT: " + std::to_string(putted));
 
 			// All data is consumed when it is all put
-			if(putted == actors) {
+			if(putted == actors-1) {
 				pthread_cond_signal(&allput);
 			}
 
@@ -96,13 +99,15 @@ class Alternate {
 				announceArrival(-1);
 			}
 
-			// Make sure the items ire accessed after they are written to
+			// Make sure the items are accessed after they are written to
 			if(dataidx == 0) {
 				pthread_mutex_lock(&allputlock);
 				pthread_cond_wait(&allput, &allputlock);
 				pthread_mutex_unlock(&allputlock);
+				log("All put, getter getting");
 			}
 	
+			log("A get is occuring");
 			int dat = data[dataidx++];
 			putlock.lock();
 			putted--;
@@ -118,18 +123,20 @@ class Alternate {
 		}
 
 
-		void unlock_all() {
+		void unlock_all(int id) {
 			log("now broadcasting");
 			pthread_cond_broadcast(&alltried);
+			alltried = PTHREAD_COND_INITIALIZER;
 		}
 
 	private:
 		pthread_cond_t alltried; 
 		pthread_cond_t allput;
+
 		int tried;
 		int putted;
+
 		pthread_mutex_t allputlock;
-		
 		std::mutex triedlock;
 		std::mutex putlock;
 		int* data;
