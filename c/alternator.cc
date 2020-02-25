@@ -43,8 +43,7 @@ class Alternate {
 
 		// Mutex functions to increment and decrement a counter that is used to see
 		// if all prods and the con have accessed the alternator
-		bool announceArrival(int id) {
-			bool last = false;
+		void announceArrival(int id) {
 			log(std::to_string(id) + " announced arrival");
 			triedlock.lock();
 			tried++;
@@ -54,11 +53,20 @@ class Alternate {
 			if(tried == actors && putted == 0) {
 				log(std::to_string(id) + " broadcasting that producers may put");
 				pthread_cond_broadcast(&alltried);
-				last = true;
+			}
+			else if(id >= 0)  { // Wait for all other threads
+				int lock = 0;
+				if((lock = pthread_mutex_lock(locks[id])) != 0 ) {
+					log("ERRRRRRRRRRRRRRRRRRRR: " + std::to_string(lock));
+				}
+				log(std::to_string(id) + " now waiting");
+				triedlock.unlock();
+				pthread_cond_wait(&alltried, locks[id]);
+				pthread_mutex_unlock(locks[id]);
+				return;
 			}
 
 			triedlock.unlock();
-			return last;
 		}
 		void announcePut(int id) {
 			log(std::to_string(id) + " announced put");
@@ -76,25 +84,18 @@ class Alternate {
 			if(putted == actors-1) {
 				log("Signaling PUUUUUUUUUUUUUUTS");
 				pthread_cond_signal(&allput);
-			}
+			} 
 
 			putlock.unlock();	
 		}
 
 		// Corresponds to Reo putter
 		void put(int id, int d) {
-			bool last = announceArrival(id);
-
-			pthread_mutex_lock(locks[id]);
-			if(!last) {
-				pthread_cond_wait(&alltried, locks[id]);
-			}
+			announceArrival(id);
 
 			log(std::to_string(id) + " now entering critical section");
 			data[id] = d;
 			announcePut(id);
-
-			pthread_mutex_unlock(locks[id]);
 		}
 
 		// Corresponds to Reo getter
