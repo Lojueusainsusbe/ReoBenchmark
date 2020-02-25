@@ -60,13 +60,13 @@ class Alternate {
 			triedlock.unlock();
 			return last;
 		}
-		void announceDeparture(int id) {	
-			log(std::to_string(id) + " announced departure");
+		void announcePut(int id) {
+			log(std::to_string(id) + " announced put");
+			
 			triedlock.lock();
 			tried--;
 			triedlock.unlock();
-		}
-		void announcePut(int id) {
+			
 			putlock.lock();
 			putted++;
 		
@@ -89,17 +89,12 @@ class Alternate {
 			if(!last) {
 				pthread_cond_wait(&alltried, locks[id]);
 			}
-			else {
-				log(std::to_string(id) + " was last");
-			}
 
 			log(std::to_string(id) + " now entering critical section");
-			data[id] = d;	
+			data[id] = d;
 			announcePut(id);
 
 			pthread_mutex_unlock(locks[id]);
-		
-			announceDeparture(id);
 		}
 
 		// Corresponds to Reo getter
@@ -125,7 +120,10 @@ class Alternate {
 				dataidx = 0;
 			}
 			
-			announceDeparture(-1);
+			triedlock.lock();
+			tried--;
+			triedlock.unlock();
+			
 			return dat;	
 		}
 
