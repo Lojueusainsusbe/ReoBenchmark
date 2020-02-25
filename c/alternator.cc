@@ -48,7 +48,7 @@ class Alternate {
 			log(std::to_string(id) + " announced arrival");
 			triedlock.lock();
 			tried++;
-			log("TRIED: " + std::to_string(tried));
+			log("TRIED: " + std::to_string(tried) + ", PUT: " + std::to_string(putted));
 
 			// All parties go at once in an alternator
 			if(tried == actors && putted == 0) {
@@ -94,13 +94,10 @@ class Alternate {
 
 		// Corresponds to Reo getter
 		int get() {
-			// Only announce arrival when not in emptying phase
-			if(dataidx == 0) {
-				announceArrival(-1);
-			}
+			announceArrival(-1);
 
 			// Make sure the items are accessed after they are written to
-			if(dataidx == 0) {
+			if(dataidx == 0 && !(putted == actors-1)) {
 				pthread_mutex_lock(&allputlock);
 				pthread_cond_wait(&allput, &allputlock);
 				pthread_mutex_unlock(&allputlock);
@@ -126,7 +123,7 @@ class Alternate {
 		void unlock_all(int id) {
 			log("now broadcasting");
 			pthread_cond_broadcast(&alltried);
-			alltried = PTHREAD_COND_INITIALIZER;
+			//alltried = PTHREAD_COND_INITIALIZER;
 		}
 
 	private:
