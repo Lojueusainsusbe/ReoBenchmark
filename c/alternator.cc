@@ -6,8 +6,6 @@
 #include<string>
 #include<pthread.h>
 
-std::chrono::time_point<std::chrono::high_resolution_clock> tstart;
-std::chrono::time_point<std::chrono::high_resolution_clock> tend;
 
 // Mutex logging
 std::mutex logmutex;
@@ -33,28 +31,17 @@ class Alternate {
 			free(data);
 		}
 
-		// Mutex functions to increment and decrement a counter that is used to see
-		// if all prods and the con have accessed the alternator
-		void announceArrival(int id) {
-			log(std::to_string(id) + " announced arrival");
-			pthread_barrier_wait(&alltriedbarrier);
-			log(std::to_string(id) + " is now freeeee");	
-		}
-
 		// Corresponds to Reo putter
 		void put(int id, int d) {
-			announceArrival(id);
-
-			log(std::to_string(id) + " now entering critical section");
+			pthread_barrier_wait(&alltriedbarrier);
 			data[id] = d;
-		
 			pthread_barrier_wait(&allputbarrier);	
 		}
 
 		// Corresponds to Reo getter
 		int get() {
 			if(dataidx == 0) {
-				announceArrival(-1);
+				pthread_barrier_wait(&alltriedbarrier);
 			}
 
 			// Make sure the items are accessed after they are written to
@@ -62,7 +49,6 @@ class Alternate {
 				pthread_barrier_wait(&allputbarrier);	
 			}
 				
-			log("A get is occuring");
 			int dat = data[dataidx++];
 			
 			// All the items have left the alternator	
@@ -98,7 +84,6 @@ class Producer {
 				alt->put(id, id);
 				actions--;
 			}
-			log("Producer " + std::to_string(id) + " shutting down");
 		}
 
 	private:
@@ -117,12 +102,15 @@ class Consumer {
 		}
 
 		void consume() {
+			auto tstart = std::chrono::high_resolution_clock::now();
+			
 			while(actions > 0) {
 				int data = alt->get();
 				actions--;
 			}
 
-			tend = std::chrono::high_resolution_clock::now();
+
+			auto tend = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double> diff = tend-tstart;
 
 			log("Consumer shutting down after " + std::to_string(diff.count()) +" seconds");
@@ -144,7 +132,6 @@ int main(int argc, char** argv) {
 
 	// Start producing
 	std::thread** threads = (std::thread**) malloc(N*sizeof(std::thread*));
-	tstart = std::chrono::high_resolution_clock::now();
 	
 	for(int i = 0; i < N; i++) {
 		producers[i].setMembers(i, &alt, productions);
