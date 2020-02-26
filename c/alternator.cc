@@ -7,15 +7,6 @@
 #include<pthread.h>
 
 
-// Mutex logging
-std::mutex logmutex;
-void log(std::string text) {
-	logmutex.lock();
-	std::cout << text << std::endl;
-	logmutex.unlock();
-}
-
-
 class Alternate {
 	public:
 		Alternate(int n) {
@@ -101,20 +92,13 @@ class Consumer {
 			actions = act;
 		}
 
-		void consume() {
-			auto tstart = std::chrono::high_resolution_clock::now();
-			
+		void consume() {			
 			while(actions > 0) {
 				int data = alt->get();
 				actions--;
 			}
-
-
-			auto tend = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double> diff = tend-tstart;
-
-			log("Consumer shutting down after " + std::to_string(diff.count()) +" seconds");
 		}
+
 	private:
 		int actions;
 		Alternate* alt;
@@ -133,6 +117,7 @@ int main(int argc, char** argv) {
 	// Start producing
 	std::thread** threads = (std::thread**) malloc(N*sizeof(std::thread*));
 	
+	auto tstart = std::chrono::high_resolution_clock::now();
 	for(int i = 0; i < N; i++) {
 		producers[i].setMembers(i, &alt, productions);
 		threads[i] = new std::thread(&Producer::produce, &producers[i]);
@@ -146,9 +131,17 @@ int main(int argc, char** argv) {
 	conthread->join();
 	for(int i = 0; i < N; i++) {	
 		threads[i]->join();
-		delete threads[i];
-	}	
+	}
 
+	// Timing
+	auto tend = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> diff = tend-tstart;
+	std::cout << diff.count() << std::endl;
+
+	// Cleanup	
+	for(int i = 0; i < N; i++) {	
+		delete threads[i];
+	}
 	delete conthread;
 	free(threads);
 }
