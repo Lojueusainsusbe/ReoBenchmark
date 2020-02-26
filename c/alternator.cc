@@ -21,72 +21,24 @@ void log(std::string text) {
 class Alternate {
 	public:
 		Alternate(int n) {
-			// Allocate stuff
-			actors = n+1;
-			locks = (pthread_mutex_t**) malloc(n*sizeof(pthread_mutex_t*));
-			for(int i = 0; i < n; i++) {
-				locks[i] = new pthread_mutex_t;
-				*locks[i] = PTHREAD_MUTEX_INITIALIZER;
-			}
 			data = (int*) malloc(n*sizeof(int));
-			
-			// Init members
-			tried = 0;
-			putted = 0;
 			dataidx = 0;
+			actors = n+1;
 
-			// Mutexes and conditions
-			alltried = PTHREAD_COND_INITIALIZER;
-			allput = PTHREAD_COND_INITIALIZER;
-			allputlock = PTHREAD_MUTEX_INITIALIZER;
+			// Barriers
+			pthread_barrier_init(&alltriedbarrier, NULL, actors);
+			pthread_barrier_init(&allputbarrier, NULL, actors);
+		}
+		~Alternate() {
+			free(data);
 		}
 
 		// Mutex functions to increment and decrement a counter that is used to see
 		// if all prods and the con have accessed the alternator
 		void announceArrival(int id) {
 			log(std::to_string(id) + " announced arrival");
-			triedlock.lock();
-			tried++;
-			log("TRIED: " + std::to_string(tried) + ", PUT: " + std::to_string(putted));
-
-			// All parties go at once in an alternator
-			if(tried == actors && putted == 0) {
-				log(std::to_string(id) + " broadcasting that producers may put");
-				pthread_cond_broadcast(&alltried);
-			}
-			else if(id >= 0)  { // Wait for all other threads
-				int lock = 0;
-				if((lock = pthread_mutex_lock(locks[id])) != 0 ) {
-					log("ERRRRRRRRRRRRRRRRRRRR: " + std::to_string(lock));
-				}
-				log(std::to_string(id) + " now waiting");
-				triedlock.unlock();
-				pthread_cond_wait(&alltried, locks[id]);
-				pthread_mutex_unlock(locks[id]);
-				return;
-			}
-
-			triedlock.unlock();
-		}
-		void announcePut(int id) {
-			log(std::to_string(id) + " announced put");
-			
-			triedlock.lock();
-			tried--;
-			triedlock.unlock();
-			
-			putlock.lock();
-			putted++;
-		
-			log(std::to_string(id) + " PUT: " + std::to_string(putted));
-
-			// All data is consumed when it is all put
-			if(putted == actors-1) {
-				log("Signaling PUUUUUUUUUUUUUUTS");
-				pthread_cond_signal(&allput);
-			} 
-
-			putlock.unlock();	
+			pthread_barrier_wait(&alltriedbarrier);
+			log(std::to_string(id) + " is now freeeee");	
 		}
 
 		// Corresponds to Reo putter
@@ -95,57 +47,40 @@ class Alternate {
 
 			log(std::to_string(id) + " now entering critical section");
 			data[id] = d;
-			announcePut(id);
+		
+			pthread_barrier_wait(&allputbarrier);	
 		}
 
 		// Corresponds to Reo getter
 		int get() {
-			announceArrival(-1);
+			if(dataidx == 0) {
+				announceArrival(-1);
+			}
 
 			// Make sure the items are accessed after they are written to
-			if(dataidx == 0 && !(putted == actors-1)) {
-				pthread_mutex_lock(&allputlock);
-				pthread_cond_wait(&allput, &allputlock);
-				pthread_mutex_unlock(&allputlock);
-				log("All put, getter getting");
+			if(dataidx == 0) {
+				pthread_barrier_wait(&allputbarrier);	
 			}
-	
+				
 			log("A get is occuring");
 			int dat = data[dataidx++];
-			putlock.lock();
-			putted--;
-			putlock.unlock();
-
+			
 			// All the items have left the alternator	
 			if(dataidx == actors-1) {
 				dataidx = 0;
 			}
 			
-			triedlock.lock();
-			tried--;
-			triedlock.unlock();
-			
 			return dat;	
 		}
 
 	private:
-		// Mutexes for blocking
-		pthread_cond_t alltried; 
-		pthread_cond_t allput;
-		pthread_mutex_t allputlock;
-	
-		// Mutexes for counters	
-		std::mutex triedlock;
-		std::mutex putlock;
-		
-		// Counters
-		int tried;
-		int putted;
-		int dataidx;
+		// Barriers
+		pthread_barrier_t alltriedbarrier;
+		pthread_barrier_t allputbarrier;
 
+		int dataidx;
 		int* data;
 		int actors;
-		pthread_mutex_t** locks;
 };
 
 
@@ -184,8 +119,6 @@ class Consumer {
 		void consume() {
 			while(actions > 0) {
 				int data = alt->get();
-				log("DATA: " + std::to_string(data));
-
 				actions--;
 			}
 
@@ -226,6 +159,9 @@ int main(int argc, char** argv) {
 	conthread->join();
 	for(int i = 0; i < N; i++) {	
 		threads[i]->join();
+		delete threads[i];
 	}	
 
+	delete conthread;
+	free(threads);
 }
