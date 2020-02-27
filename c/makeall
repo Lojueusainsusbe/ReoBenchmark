@@ -13,5 +13,5 @@ fi
 for i in *.cc; do
 	name=$(echo $i | tr "." "\n" | head -n 1)
 	echo "Compiling $i"
-	g++ -O2 -Wall -Wextra -pthread $i -o $name
+	g++ -g -Wall -Wextra -pthread $i -o $name
 done

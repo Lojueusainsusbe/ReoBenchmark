@@ -70,6 +70,11 @@ class Producer {
 			actions = act;
 		}
 
+		static void* prodcall(void* ptr) {
+			(static_cast<Producer*>(ptr))->produce();
+			return NULL;
+		}
+
 		void produce() {
 			while(actions > 0) {
 				alt->put(id, id);
@@ -90,6 +95,11 @@ class Consumer {
 		void setMembers(Alternate* a, int act) {
 			alt = a;
 			actions = act;
+		}
+
+		static void* concall(void* ptr) {
+			(static_cast<Consumer*>(ptr))->consume();
+			return NULL;
 		}
 
 		void consume() {			
@@ -115,22 +125,24 @@ int main(int argc, char** argv) {
 	Alternate alt(N);
 
 	// Start producing
-	std::thread** threads = (std::thread**) malloc(N*sizeof(std::thread*));
+	pthread_t** threads = (pthread_t**) malloc(N*sizeof(pthread_t*));
 	
 	auto tstart = std::chrono::high_resolution_clock::now();
 	for(int i = 0; i < N; i++) {
+		threads[i] = new pthread_t;
 		producers[i].setMembers(i, &alt, productions);
-		threads[i] = new std::thread(&Producer::produce, &producers[i]);
+		pthread_create(threads[i], NULL, &Producer::prodcall, &producers[i]);
 	}
 
 	// Start consuming
 	consumer.setMembers(&alt, productions * N);
-	std::thread* conthread = new std::thread(&Consumer::consume, &consumer);	
+	pthread_t conthread;
+	pthread_create(&conthread, NULL, &Consumer::concall, &consumer);
 
 	// Join all the threads
-	conthread->join();
+	pthread_join(conthread, NULL);
 	for(int i = 0; i < N; i++) {	
-		threads[i]->join();
+		pthread_join(*threads[i], NULL);
 	}
 
 	// Timing
@@ -142,6 +154,5 @@ int main(int argc, char** argv) {
 	for(int i = 0; i < N; i++) {	
 		delete threads[i];
 	}
-	delete conthread;
 	free(threads);
 }

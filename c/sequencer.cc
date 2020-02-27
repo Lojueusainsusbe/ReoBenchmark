@@ -3,12 +3,14 @@
 #include<iostream>
 #include<chrono>
 #include<thread>
+#include<string>
 
 class Sequence {
 	public:
 		Sequence(int num) {
 			N = num;
-			
+			turn = 0;
+
 			// Create mutexes and conditions
 			conds = (pthread_cond_t**) malloc(N * sizeof(pthread_cond_t**));
 			locks = (pthread_mutex_t**) malloc(N * sizeof(pthread_mutex_t**));
@@ -22,24 +24,35 @@ class Sequence {
 		~Sequence() {
 			for(int i = 0; i < N; i++) {
 				delete conds[i];
+				delete locks[i];
 			}
 			free(conds);
+			free(locks);
 		}
 
 		// Producer id does a put on the protocol
-		void put(int id, int data) {
-			// Wait if its not your turn
-			if(turn != id) {
-				pthread_mutex_lock(locks[id]);
+		void put(int id, int data) {		
+			// Atomically check whether its your turn
+			pthread_mutex_lock(locks[id]);
+			if(id != turn) {
+				// Wait if not
 				pthread_cond_wait(conds[id], locks[id]);
-				pthread_mutex_unlock(locks[id]);
+				turn = id;
 			}
+			pthread_mutex_unlock(locks[id]);
+
+			// Block next producer
+			int next = (id + 1) % N;
+			pthread_mutex_lock(locks[next]);
 			
+			// Critical section
 			buff = data;
 
-			// Signal that the next producer may go
-			pthread_cond_signal(conds[(id+1)%N]);
-			turn++;
+			// Pass turn to the next producer
+			turn = next;
+			pthread_cond_signal(conds[next]);
+			pthread_mutex_unlock(locks[next]);
+
 		}
 
 		// This protocol does not have outputs
@@ -60,6 +73,11 @@ class Producer {
             id = i;
             seq = s;
             actions = act;
+        }
+
+		static void* prodcall(void* ptr) {
+            (static_cast<Producer*>(ptr))->produce();
+            return NULL;
         }
 
         void produce() {
@@ -85,18 +103,19 @@ int main(int argc, char** argv) {
 	Sequence seq(N);
 
 	// Start producing
-	std::thread** threads = (std::thread**) malloc(N*sizeof(std::thread*));
+	pthread_t** threads = (pthread_t**) malloc(N*sizeof(pthread_t*));	
 	
 	auto tstart = std::chrono::high_resolution_clock::now();
 	for(int i = 0; i < N; i++) {
+		threads[i] = new pthread_t;
 		producers[i].setMembers(i, &seq, productions);
-		threads[i] = new std::thread(&Producer::produce, &producers[i]);
+		pthread_create(threads[i], NULL, &Producer::prodcall, &producers[i]);
 	}
 
 	// Join all the threads
-	for(int i = 0; i < N; i++) {	
-		threads[i]->join();
-	}
+	for(int i = 0; i < N; i++) {
+        pthread_join(*threads[i], NULL);
+    }
 
 	// Timing
 	auto tend = std::chrono::high_resolution_clock::now();
