@@ -4,92 +4,120 @@
 #include<chrono>
 #include<thread>
 
-class XConsumer {
+
+class xRoute {
 	public:
-		XConsumer() {}
-    void init(int i, int* b, std::mutex* wl, std::mutex* rl) {
-      id = i;
-      buff = b;
-      write_lock = wl;
-      read_lock = rl;
-    }
+		xRoute(int n) {
+			N = n;
+		}
+		~xRoute() {
+		
+		}
 
-		void consume() {
-      while(true) {
-  			read_lock->lock();
+		void put(int id, int data) {
+		
+		}
 
-  			std::cout << id << " reads: " << *buff << std::endl;
-
-  			write_lock->unlock(); //producer may now overwrite value
-
-        std::this_thread::sleep_for(std::chrono::milliseconds((id+1)*20*(rand()%50)));
-      }
+		int get() {
+			
 		}
 
 	private:
-    int id;
-    int* buff;
-		std::mutex* write_lock;
-    std::mutex* read_lock;
+		int N;
 };
 
 
 class Producer {
-	public:
-		Producer() {}
-		void init(int* b, std::mutex* wl, std::mutex* rl) {
-      buff = b;
-      write_lock = wl;
-      read_lock = rl;
-		}
+    public:
+        Producer() {}
+        void setMembers(xRoute* x, int act) {
+            xr = x;
+            actions = act;
+        }
 
-		void produce() {
-			// Randomize when consumers start
-			std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
-			while(true) {
-        write_lock->lock();
+        static void* prodcall(void* ptr) {
+            (static_cast<Producer*>(ptr))->produce();
+            return NULL;
+        }
 
-				*buff = rand();
+        void produce() {
+            while(actions > 0) {
+                alt->put(id, id);
+                actions--;
+            }
+        }
 
-        read_lock->unlock(); //buffer is free for reading
+    private:
+        int actions;
+        xRoute* xr;
+};
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(20*(rand()%50)));
-			}
-		}
-	private:
-    int* buff;
-		std::mutex* write_lock;
-    std::mutex* read_lock;
+
+class Consumer {
+    public:
+        Consumer() {}
+        void setMembers(xRoute* x, int act) {
+            xr = x;
+            actions = act;
+        }
+
+        static void* concall(void* ptr) {
+            (static_cast<Consumer*>(ptr))->consume();
+            return NULL;
+        }
+
+        void consume() {
+            while(actions > 0) {
+                int data = alt->get();
+                actions--;
+            }
+        }
+
+    private:
+        int actions;
+        xRoute* alt;
 };
 
 
 int main(int argc, char** argv) {
-	if(argc < 2) { std::cerr << "Give a number of Consumers" << std::endl; return -1; }
-	int N = strtol(argv[1], NULL, 10);
+    if(argc < 3) { std::cout << "Give a number of producers and an action count" << std::endl; return -1; }
+    int N = strtol(argv[1], NULL, 10);
+    int productions = strtol(argv[2], NULL, 10);
 
-	Producer producer;
-	XConsumer consumers[N];
+    Producer consumers[N];
+    Consumer producer;
+   	xRoute xR(N);
 
-	// Start producing
-	std::thread** threads = (std::thread**) malloc(N*sizeof(std::thread*));
+    // Start producing
+    pthread_t** threads = (pthread_t**) malloc(N*sizeof(pthread_t*));
 
-  int shared_buffer;
-  std::mutex shared_write_lock;
-  std::mutex shared_read_lock;
-  shared_read_lock.lock();
+    auto tstart = std::chrono::high_resolution_clock::now();
+    for(int i = 0; i < N; i++) {
+        threads[i] = new pthread_t;
+        consumers[i].setMembers(&xR, productions);
+        pthread_create(threads[i], NULL, &Producer::prodcall, &producers[i]);
+    }
 
-  producer.init(&shared_buffer, &shared_write_lock, &shared_read_lock);
+    // Start consuming
+    consumer.setMembers(&alt, productions * N);
+    pthread_t conthread;
+    pthread_create(&conthread, NULL, &Consumer::concall, &consumer);
 
-	for(int i = 0; i < N; i++) {
-    consumers[i].init(i, &shared_buffer, &shared_write_lock, &shared_read_lock);
-		threads[i] = new std::thread(&XConsumer::consume, &consumers[i]);
-  }
+    // Join all the threads
+    pthread_join(conthread, NULL);
+    for(int i = 0; i < N; i++) {
+        pthread_join(*threads[i], NULL);
+    }
 
-  producer.produce();
+    // Timing
+    auto tend = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diff = tend-tstart;
+    std::cout << diff.count() << std::endl;
 
-	// Join all the threads
-	for(int i = 0; i < N; i++) {
-		threads[i]->join();
-	}
-
+    // Cleanup
+    for(int i = 0; i < N; i++) {
+        delete threads[i];
+    }
+    free(threads);
 }
+
