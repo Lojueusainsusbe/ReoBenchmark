@@ -27,6 +27,3 @@ $(MAIN_TARGET): $(OBJECTS) $(MAIN_OBJ)
 
 clean:
 	rm -f $(OBJECTS) $(MAIN_OBJ) $(DEPS) $(MAIN_DEPS) $(MAIN_TARGET)
-	rm -f results/*
-	rm -f board.png
-	rm -rf html
