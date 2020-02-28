@@ -5,8 +5,11 @@
 
 
 class Consumer : public IO {
-  protected:
-    //consume
+	public:
+		Consumer();
+		~Consumer();
+	protected:
+    	//consume
         void act() override;
 };
 

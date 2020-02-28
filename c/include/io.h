@@ -4,18 +4,19 @@
 #define IO_h
 
 class IO {
-  public:
-    void setMembers(int i, Protocol* p, int act);
+	public:
+		IO();
+		virtual ~IO() {}
+		void setMembers(int i, Protocol* p, int act);
+	  	static void* call(void* ptr);
 
-    static void* call(void* ptr);
+	protected:
+		//implement producing/consuming actions
+		virtual void act() = 0;
 
-  protected:
-    //implement producing/consuming actions
-    virtual void act() = 0;
-
-    int id;
-    int actions;
-    Protocol* protocol;
+		int id;
+		int actions;
+		Protocol* protocol;
 };
 
 #endif

@@ -4,7 +4,10 @@
 #include "io.h"
 
 class Producer : public IO {
-  protected:
+	public:
+		Producer();
+	 	~Producer();
+	protected:
     //produce
         void act() override;
 };

@@ -1,8 +1,11 @@
 #include "alternator.h"
 #include "sequencer.h"
+#include "producer.h"
+#include "consumer.h"
+
 
 void SequencerTest(int N, int actions) {
-    Producer producers[N];
+    Producer* producers = (Producer*) malloc(N * sizeof(Producer));
     Sequence seq(N);
 
     // Start producing
@@ -12,7 +15,7 @@ void SequencerTest(int N, int actions) {
     for(int i = 0; i < N; i++) {
         threads[i] = new pthread_t;
         producers[i].setMembers(i, &seq, actions);
-        pthread_create(threads[i], NULL, &Producer::prodcall, &producers[i]);
+        pthread_create(threads[i], NULL, &Producer::call, &producers[i]);
     }
 
     // Join all the threads
@@ -30,11 +33,12 @@ void SequencerTest(int N, int actions) {
         delete threads[i];
     }
     free(threads);
+	free(producers);
 }
 
 
 void AlternatorTest(int N, int actions) {
-Producer producers[N];
+    Producer* producers = (Producer*) malloc(N * sizeof(Producer));
     Consumer consumer;
     Alternate alt(N);
 
@@ -45,13 +49,13 @@ Producer producers[N];
     for(int i = 0; i < N; i++) {
         threads[i] = new pthread_t;
         producers[i].setMembers(i, &alt, actions);
-        pthread_create(threads[i], NULL, &Producer::prodcall, &producers[i]);
+        pthread_create(threads[i], NULL, &Producer::call, &producers[i]);
     }
 
     // Start consuming
-    consumer.setMembers(&alt, actions * N);
+    consumer.setMembers(-1, &alt, actions * N);
     pthread_t conthread;
-    pthread_create(&conthread, NULL, &Consumer::concall, &consumer);
+    pthread_create(&conthread, NULL, &Consumer::call, &consumer);
 
     // Join all the threads
     pthread_join(conthread, NULL);
@@ -69,6 +73,7 @@ Producer producers[N];
         delete threads[i];
     }
     free(threads);
+	free(producers);
 }
 
 

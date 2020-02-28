@@ -9,7 +9,7 @@ DEPS 			= $(OBJECTS:.o=.d)
 MAIN_DEPS		= $(MAIN_OBJ:.o=.d)
 MAIN_TARGET 	= test
 CC				= g++
-CFLAGS			= -std=c++11 -g -Wall
+CFLAGS			= -std=c++11 -pthread -g -Wall
 CPPFLAGS 		= $(addprefix -I, $(INC_DIR)) -pedantic
 
 

@@ -1,6 +1,11 @@
 #include "consumer.h"
+#include <iostream>
 
-void Consumer::act() override {
+Consumer::Consumer() {}
+
+Consumer::~Consumer() {}
+
+void Consumer::act() {
 	while(actions > 0) {
 		int data = protocol->get();
 		std::cerr << id << " got " << data << std::endl;

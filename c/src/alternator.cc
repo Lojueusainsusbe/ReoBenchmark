@@ -24,14 +24,14 @@ Alternate::~Alternate() {
 
 
 // Corresponds to Reo putter
-void Alternator::put(int id, int d) override {
+void Alternate::put(int id, int d) {
 	pthread_barrier_wait(&alltriedbarrier);
 	data[id] = d;
 	pthread_barrier_wait(&allputbarrier);	
 }
 
 // Corresponds to Reo getter
-int Alternator::get() override {
+int Alternate::get() {
 	if(dataidx == 0) {
 		pthread_barrier_wait(&alltriedbarrier);
 	}

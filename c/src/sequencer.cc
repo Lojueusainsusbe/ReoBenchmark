@@ -32,7 +32,7 @@ Sequence::~Sequence() {
 }
 
 // Producer id does a put on the protocol
-void Sequence::put(int id, int data) override {		
+void Sequence::put(int id, int data) {
 	// Atomically check whether its your turn
 	pthread_mutex_lock(locks[id]);
 	if(id != turn) {
@@ -54,4 +54,4 @@ void Sequence::put(int id, int data) override {
 	pthread_mutex_unlock(locks[next]);
 }
 
-
+int Sequence::get() {}
