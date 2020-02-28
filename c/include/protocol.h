@@ -1,5 +1,5 @@
-// #ifdef __PROTOCOL__
-// #define __PROTOCOL__
+#ifdef protocol_h
+#define protocol_h
 
 class Protocol {
 	public:
@@ -10,4 +10,4 @@ class Protocol {
 		virtual int get() = 0;
 };
 
-// #endif
+#endif
