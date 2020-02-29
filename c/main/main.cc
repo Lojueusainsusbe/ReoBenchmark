@@ -5,7 +5,8 @@
 
 
 void SequencerTest(int N, int actions) {
-    Producer* producers = (Producer*) malloc(N * sizeof(Producer));
+	std::cout << "SEQTEST" << std::endl;
+	Producer** producers = (Producer**) malloc(N * sizeof(Producer*));
     Sequence seq(N);
 
     // Start producing
@@ -14,8 +15,9 @@ void SequencerTest(int N, int actions) {
     auto tstart = std::chrono::high_resolution_clock::now();
     for(int i = 0; i < N; i++) {
         threads[i] = new pthread_t;
-        producers[i].setMembers(i, &seq, actions);
-        pthread_create(threads[i], NULL, &Producer::call, &producers[i]);
+		producers[i] = new Producer;
+        producers[i]->setMembers(i, &seq, actions);
+        pthread_create(threads[i], NULL, &Producer::call, producers[i]);
     }
 
     // Join all the threads
@@ -31,6 +33,7 @@ void SequencerTest(int N, int actions) {
     // Cleanup  
     for(int i = 0; i < N; i++) {
         delete threads[i];
+		delete producers[i];
     }
     free(threads);
 	free(producers);
@@ -38,7 +41,8 @@ void SequencerTest(int N, int actions) {
 
 
 void AlternatorTest(int N, int actions) {
-    Producer* producers = (Producer*) malloc(N * sizeof(Producer));
+	std::cout << "ALTTEST" << std::endl;
+    Producer** producers = (Producer**) malloc(N * sizeof(Producer*));
     Consumer consumer;
     Alternate alt(N);
 
@@ -48,8 +52,9 @@ void AlternatorTest(int N, int actions) {
     auto tstart = std::chrono::high_resolution_clock::now();
     for(int i = 0; i < N; i++) {
         threads[i] = new pthread_t;
-        producers[i].setMembers(i, &alt, actions);
-        pthread_create(threads[i], NULL, &Producer::call, &producers[i]);
+		producers[i] = new Producer;
+        producers[i]->setMembers(i, &alt, actions);
+        pthread_create(threads[i], NULL, &Producer::call, producers[i]);
     }
 
     // Start consuming
@@ -71,6 +76,7 @@ void AlternatorTest(int N, int actions) {
     // Cleanup  
     for(int i = 0; i < N; i++) {
         delete threads[i];
+		delete producers[i];
     }
     free(threads);
 	free(producers);

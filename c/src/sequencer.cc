@@ -54,4 +54,6 @@ void Sequence::put(int id, int data) {
 	pthread_mutex_unlock(locks[next]);
 }
 
-int Sequence::get() {}
+int Sequence::get() {
+	return 0;
+}
