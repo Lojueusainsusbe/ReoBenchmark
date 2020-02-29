@@ -22,7 +22,7 @@ class Sequence : public Protocol {
 		void put(int id, int data) override;
 
 		// This protocol does not have outputs
-		int get() override;
+		int get(int id) override;
 	private:
 		pthread_mutex_t** locks;
 		pthread_cond_t** conds;

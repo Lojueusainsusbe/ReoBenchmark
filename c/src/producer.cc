@@ -5,7 +5,7 @@ Producer::~Producer() {}
 
 void Producer::act() {
 	while(actions > 0) {
-		protocol->put(id, id);
+		protocol->put(id, actions);
 		actions--;
 	}
 }

@@ -3,7 +3,6 @@
 
 #include "io.h"
 
-
 class Consumer : public IO {
 	public:
 		Consumer();

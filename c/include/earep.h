@@ -10,26 +10,31 @@
 #include<pthread.h>
 
 #include "protocol.h"
-#include "consumer.h"
-#include "producer.h"
 
 class EARep : public Protocol{
 	public:
 		EARep(int n);
+		~EARep();
 
 		void put(int data, int id) override;
 
-		int get() override;
+		int get(int id) override;
 
 	private:
-		pthread_mutex_t putlock;
+		//Barrier
 		pthread_barrier_t conbarrier;
-		pthread_cond_t putcond;
 
+		//Conditions
+		pthread_cond_t concond;
+		pthread_cond_t prodcond;
 
-		int buff;
-		int N;
-		bool accepting;
+		//Locks
+		pthread_mutex_t** conlocks;
+		pthread_mutex_t prodlock;
+		pthread_mutex_t countlock;
+
+		int buff, N, count;
+		bool fifo;
 };
 
 #endif
