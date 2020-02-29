@@ -1,0 +1,11 @@
+import reo.sync;
+import reo.fifo1;
+
+EarlyAsyncReplicator<N:int>(p[1]?, x[1..N]!){
+  fifo1(p, m)
+  {
+    sync(m, x[i])
+  |
+    i:<1..N>
+  }
+}
