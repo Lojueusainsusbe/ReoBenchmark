@@ -1,4 +1,7 @@
 # c executables
-c/alternator
-c/sequencer
-c/xrouter
+c/test
+
+
+# c files
+*.o
+*.d
