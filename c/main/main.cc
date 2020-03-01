@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
   int N = strtol(argv[1], NULL, 10);
   int actions = strtol(argv[2], NULL, 10);
 
-	//SequencerTest(N, actions);
-	//AlternatorTest(N, actions);
+	SequencerTest(N, actions);
+	AlternatorTest(N, actions);
 	EarepTest(N, actions);
 }

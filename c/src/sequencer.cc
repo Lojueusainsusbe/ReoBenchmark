@@ -37,7 +37,6 @@ void Sequence::put(int id, int data) {
 	pthread_mutex_lock(locks[id]);
 	if(id != turn) {
 		pthread_cond_wait(conds[id], locks[id]);
-		turn = id;
 	}
 	pthread_mutex_unlock(locks[id]);
 
@@ -50,8 +49,8 @@ void Sequence::put(int id, int data) {
 
 	// Pass turn to the next producer
 	turn = next;
-	pthread_cond_signal(conds[next]);
 	pthread_mutex_unlock(locks[next]); //TODO rintse omdraaien?
+	pthread_cond_signal(conds[next]);
 }
 
 int Sequence::get(int id) {
