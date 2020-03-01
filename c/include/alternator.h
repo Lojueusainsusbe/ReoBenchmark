@@ -20,7 +20,7 @@ class Alternate : public Protocol {
 		// Corresponds to Reo putter
 		void put(int id, int d) override;
 		// Corresponds to Reo getter
-		int get() override;
+		int get(int id) override;
 
 	private:
 		// Barriers
