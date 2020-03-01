@@ -1,5 +1,6 @@
 #include "alternator.h"
 #include "sequencer.h"
+#include "eaoseq.h"
 #include "earep.h"
 #include "producer.h"
 #include "consumer.h"
@@ -40,6 +41,46 @@ void SequencerTest(int N, int actions) {
 	free(producers);
 }
 
+void EAOSequencerTest(int N, int actions) {
+	std::cout << "EAOSEQUENCERTEST" << std::endl;
+	Consumer** consumers = (Consumer**) malloc(N * sizeof(Consumer*));
+	Producer producer;
+	EAOSequence eaos(N);
+	pthread_t** threads = (pthread_t**) malloc(N*sizeof(pthread_t*));
+
+	auto tstart = std::chrono::high_resolution_clock::now();
+
+	for(int i = 0; i < N; i++) {
+      threads[i] = new pthread_t;
+			consumers[i] = new Consumer;
+      consumers[i]->setMembers(i, &eaos, actions);
+      pthread_create(threads[i], NULL, &Consumer::call, consumers[i]);
+  }
+
+	producer.setMembers(-1, &eaos, actions*N);
+	pthread_t prodthread;
+	pthread_create(&prodthread, NULL, &Producer::call, &producer);
+
+	// Join all the threads
+  pthread_join(prodthread, NULL);
+  for(int i = 0; i < N; i++) {
+      pthread_join(*threads[i], NULL);
+  }
+
+  // Timing
+  auto tend = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> diff = tend-tstart;
+  std::cout << diff.count() << std::endl;
+
+  // Cleanup
+  for(int i = 0; i < N; i++) {
+      delete threads[i];
+			delete consumers[i];
+  }
+  free(threads);
+	free(consumers);
+}
+
 
 void AlternatorTest(int N, int actions) {
 	std::cout << "ALTTEST" << std::endl;
@@ -53,7 +94,7 @@ void AlternatorTest(int N, int actions) {
   auto tstart = std::chrono::high_resolution_clock::now();
   for(int i = 0; i < N; i++) {
       threads[i] = new pthread_t;
-	producers[i] = new Producer;
+			producers[i] = new Producer;
       producers[i]->setMembers(i, &alt, actions);
       pthread_create(threads[i], NULL, &Producer::call, producers[i]);
   }
@@ -133,4 +174,5 @@ int main(int argc, char** argv) {
 	SequencerTest(N, actions);
 	AlternatorTest(N, actions);
 	EarepTest(N, actions);
+	EAOSequencerTest(N, actions);
 }
