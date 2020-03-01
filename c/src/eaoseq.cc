@@ -26,7 +26,7 @@ void EAOSequence::put(int id, int data) {
   pthread_mutex_lock(&buf_lock);
 
   buff = turn;
-
+  
   pthread_mutex_unlock(&c_locks[(turn++)%N]);
 }
 
@@ -34,7 +34,6 @@ int EAOSequence::get(int id) {
   pthread_mutex_lock(&c_locks[id]);
 
   int temp = buff;
-  std::cerr << id << ": " << temp << std::endl;
 
   pthread_mutex_unlock(&buf_lock);
 
