@@ -4,16 +4,13 @@ declare -a sizes=("4" "16" "64" "256" "512" "1024")
 runs=5
 actions=2000000
 
+# Compile the C++ code
+make
 
 for i in treo/*; do
 	name=$(echo $i | tr "." "\n" | head -n 1 | tr "/" "\n" | tail -n 1)
 	cname=$name.cc
 	treoname=$name.treo
-	
-	# Compile the C code
-	cd c
-	g++ -Wall -Wextra -pthread -std=c++11 cname -o name
-	cd ..	
 
 	for size in "${sizes[@]}"; do
 
@@ -23,11 +20,11 @@ for i in treo/*; do
 		reo $treoname -t Rust -p N:int=$size
 		rstosh $name.rs
 		g++ $cname $name.so -o $name
-		
+
 		# Cleanup
 		rm $name.rs $name.so
 		cd ..
-	
+
 		# Collect CPU cycles and runtime stats
 		for run in [0..$runs]; do
 			# Run C code and save stdout (interactions per second)
