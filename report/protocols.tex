@@ -1,0 +1,39 @@
+\section{Protocols}
+\subsection{Sequencer}
+This protocol ensures that N producers fire in a cyclic sequence.\\
+
+\includegraphics[]{img/seq.png}\\
+
+It has the following data stream semantics:\\
+$
+Sequencer<N>(\langle \alpha_0, a_0 \rangle \langle \alpha_1, a_1 \rangle... \langle \alpha_{N-1}, a_{N-1} \rangle) \equiv \\
+\alpha_0(0) < \alpha_1(0) < ... < \alpha_{N-1}(0) < \alpha_0(1) \\
+Seq<N>(\langle \alpha_0', a_0' \rangle \langle \alpha_1', a_1' \rangle... \langle \alpha_{N-1}', a_{N-1}' \rangle)
+$
+
+
+\subsection{Alternator}
+This protocol waits for all N inputs to put and the one output to get, after which the data of the first producer is instantly consumed. All the other producers have their output buffered, and consumed one by one in a set order. Only after all data has been consumed, may the producers fire again.\\
+
+\includegraphics[]{img/alt.png}\\
+
+It has the following data stream semantics:\\
+$
+Alternator<N>(\langle \alpha_0, a_0 \rangle \langle \alpha_1, a_1 \rangle... \langle \alpha_{N-1}, a_{N-1} \rangle, \langle \beta, b \rangle) \equiv\\
+\alpha_0(0) = \alpha_1(0) = ... = \alpha_{N-1}(0) = \beta(0) < \beta(1) < ... < \beta(N-1) < \alpha_0(1) \\
+\forall 0 \leq i < N : b(i) = a_i(0) \\
+Alternator<N>(\langle \alpha_0', a_0' \rangle \langle \alpha_1', a_1' \rangle... \langle \alpha_{N-1}', a_{N-1}' \rangle, \langle \beta(N,...), b(N,...) \rangle)
+$
+
+\subsection{Early Async Replicator}
+This protocol has one producer, whose data is buffered when put, and $N$ consumers, which all replicate the producers data. All consumers fire simultaneously, but strictly after the producer.\\
+
+\includegraphics[]{img/EARep.png}\\
+
+$
+EARep(\langle \alpha, a \rangle, \langle \beta_0, b_0 \rangle \langle \beta_1, b_1 \rangle... \langle \beta_{N-1}, b_{N-1} \rangle) \equiv \\
+\forall 0 \leq i < N : \alpha(0) < \beta_i(0) < \alpha(1) \land a(0) = b_i(0) \\
+\forall 0 \leq i < N : \forall 0 \leq i < N : \beta_i(0) = \beta_j(0)
+$
+
+It has the following data stream semantics:\\
