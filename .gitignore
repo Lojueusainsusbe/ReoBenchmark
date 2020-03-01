@@ -5,3 +5,7 @@ c/test
 # c files
 *.o
 *.d
+
+# java
+*.class
+*.java

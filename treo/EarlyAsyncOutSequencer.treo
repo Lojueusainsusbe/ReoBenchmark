@@ -1,0 +1,28 @@
+import reo.sync;
+import reo.lossy;
+import reo.fifo1;
+import reo.fifofull;
+import reo.syncdrain;
+
+EarlyAsyncOutSequencer<N:int>(p?, x[1..N]!){
+  fifo1(p, m)
+  syncdrain(m, n)
+  {
+    lossy(m, a[i])
+    sync(a[i], n)
+    sync(a[i], b[i])
+    sync(b[i], x[i])
+  |
+    i:<1..N>
+  }
+
+  {
+    fifo1(c[i], c[i+1])
+    syncdrain(c[i+1], b[i])
+  |
+    i : <2..N>
+  }
+  fifofull<"0">(c[1], c[2])
+  syncdrain(c[2],b[1])
+  sync(c[N+1], c[1])
+}
