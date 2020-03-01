@@ -4,6 +4,7 @@
 class Protocol {
 	public:
 		Protocol(){}
+		virtual ~Protocol(){}
 		// Corresponds to Reo putter
 		virtual void put(int id, int d) = 0;
 
