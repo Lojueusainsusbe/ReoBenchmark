@@ -1,5 +1,6 @@
 #include "alternator.h"
 #include "sequencer.h"
+#include "eaoseq.h"
 #include "earep.h"
 #include "producer.h"
 #include "consumer.h"
@@ -14,9 +15,17 @@ Protocol* protocolFromString(std::string s, int Nprod, int Ncons) {
 		std::cerr << "Testing Sequencer with " << Nprod << " producers." << std::endl;
 		return new Sequence(Nprod);
 	}
-	else {
+	else if(s == "earep") {
 		std::cerr << "Testing EARep with " << Ncons << " consumers." << std::endl;
 		return new EARep(Ncons);
+	}
+	else if(s == "eaoseq") {
+		std::cerr << "Testing EAOSequencer with " << Ncons << " consumers." << std::endl;
+		return new EAOSequence(Ncons);
+	}
+	else {
+		std::cerr << "Invalid protocol name." << std::endl;
+		return NULL;
 	}
 }
 
@@ -84,6 +93,7 @@ int main(int argc, char** argv) {
 							<< "and a number of consumptions" << std::endl;
 		return -1;
 	}
+	//NOTE EAOSequencer: for k consumers, consuming n items. produce k*n items
 
   int Nprod = strtol(argv[2], NULL, 10);
 	int actProd = strtol(argv[3], NULL, 10);
@@ -92,7 +102,8 @@ int main(int argc, char** argv) {
 	Protocol* p = protocolFromString(std::string(argv[1]), Nprod, Ncons);
 
 	//Run test
-	test(p, Nprod, actProd, Ncons, actCons);
+	if(p != NULL)
+		test(p, Nprod, actProd, Ncons, actCons);
 
 	delete p;
 }
