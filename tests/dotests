@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for i in ./test-*; do
+    ./$i $1
+done
