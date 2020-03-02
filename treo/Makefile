@@ -25,6 +25,5 @@ $(MAIN_TARGET): $(OBJECTS) $(MAIN_OBJ)
 %.o: %.cc
 	$(CC) $(CFLAGS) $(CPPFLAGS) -MMD -o $@ -c $<
 
-
 clean:
 	rm -f $(OBJECTS) $(MAIN_OBJ) $(DEPS) $(MAIN_DEPS) $(MAIN_TARGET)
