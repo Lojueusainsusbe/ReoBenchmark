@@ -13,7 +13,9 @@ $
 
 
 \subsection{Alternator}
-This protocol waits for all N inputs to put and the one output to get, after which the data of the first producer is instantly consumed. All the other producers have their output buffered, and consumed one by one in a set order. Only after all data has been consumed, may the producers fire again.\\
+This protocol waits for all N inputs to put and the one output to get, after which the data of the first producer is instantly consumed.
+All the other producers have their output buffered, and consumed one by one in a set order.
+Only after all data has been consumed, may the producers fire again.\\
 
 \includegraphics[]{img/alt.png}\\
 
@@ -26,7 +28,8 @@ Alternator<N>(\langle \alpha_0', a_0' \rangle \langle \alpha_1', a_1' \rangle...
 $
 
 \subsection{Early Async Replicator}
-This protocol has one producer, whose data is buffered when put, and $N$ consumers, which all replicate the producers data. All consumers fire simultaneously, but strictly after the producer.\\
+This protocol has one producer, whose data is buffered when put, and $N$ consumers, which all replicate the producers data.
+All consumers fire simultaneously, but strictly after the producer.\\
 
 \includegraphics[]{img/EARep.png}\\
 
