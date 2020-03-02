@@ -15,8 +15,6 @@ cd __skellycrate
 cargo +nightly build --release
 
 cd ..
-cp ./__skellycrate/target/release/libtemp.so "./$SRCNAME.so"
+cp ./__skellycrate/target/release/libtemp.so "./protocol.so"
 
 rm ./__skellycrate -rf
-
-

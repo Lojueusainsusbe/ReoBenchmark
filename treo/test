@@ -1,0 +1,21 @@
+#!/bin/bash
+prot=$1
+pCount=$2
+pAct=$3
+cCount=$4
+cAct=$5
+
+if [[ $prot == "seq" ]]; then
+    proto="Nsequencer"
+fi
+if [[ $prot == "alt" ]]; then
+    proto="Nalternator"
+fi
+if [[ $prot == "ear" ]]; then
+    proto="EarlyAsyncReplicator"
+fi
+
+reo $proto.treo -p P:int=$pCount C:int=$cCount -t Rust
+../rstosh $proto.rs
+make
+./treotest $1 $2 $3 $4 $5

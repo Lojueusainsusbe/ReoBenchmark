@@ -7,7 +7,7 @@ OBJECTS			= $(SOURCES:.cc=.o)
 MAIN_OBJ		= $(MAIN_SRC:.cc=.o)
 DEPS 			= $(OBJECTS:.o=.d)
 MAIN_DEPS		= $(MAIN_OBJ:.o=.d)
-MAIN_TARGET 	= test
+MAIN_TARGET 	= treotest
 CC				= g++
 CFLAGS			= -std=c++11 -pthread -O3 -Wall
 CPPFLAGS 		= $(addprefix -I, $(INC_DIR)) -pedantic

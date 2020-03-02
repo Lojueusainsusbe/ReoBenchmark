@@ -4,7 +4,7 @@ import reo.fifo1;
 import reo.fifofull;
 import reo.syncdrain;
 
-EarlyAsyncOutSequencer<N:int>(p[1]?, x[1..N]!){
+EarlyAsyncOutSequencer<N:int, C:int>(p[1..C]?, x[1..N]!){
   fifo1(p[1], m)
   syncdrain(m, n)
   {
