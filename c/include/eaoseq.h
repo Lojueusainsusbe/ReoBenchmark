@@ -30,7 +30,13 @@ class EAOSequence : public Protocol {
   int get(int id) override;
   private:
     pthread_mutex_t* c_locks;
+    pthread_cond_t* c_conds;
+
     pthread_mutex_t buf_lock;
+    pthread_cond_t buf_cond;
+
+    pthread_barrier_t init_barrier;
+
     int N;
     int turn;
     int buff;
