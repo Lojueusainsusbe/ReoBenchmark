@@ -8,7 +8,7 @@ class IO {
 		IO();
 		virtual ~IO() {}
 		void setMembers(int i, Protocol* p, int act);
-	  	static void* call(void* ptr);
+	  static void* call(void* ptr);
 
 	protected:
 		//implement producing/consuming actions
@@ -20,4 +20,3 @@ class IO {
 };
 
 #endif
-

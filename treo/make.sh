@@ -1,4 +1,4 @@
 #!/bin/bash
 
 echo compiling the main program
-gcc ./main.c ./$1.so -o $1
+g++ -pthread -g ./main.c ./$1.so -o $1
