@@ -1,24 +1,18 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <thread>
 #include <chrono>
-extern "C"{
-  #include "reo_rs_ext.h"
-};
-#include "assert.h"
+#include <algorithm>
+//#include "assert.h"
 
-#define maxint(a,b) \
-  ({int _a = (a), _b = (b); _a > _b ? _a : _b; })
+#include "producer.h"
+#include "consumer.h"
+
 
 /*
 TODO
 - schrijf wrappertje:
   vorm ./test alt 3 3 3 3
   alt, ear/rep?, seq
-- .h files, makefile etc.
 - Timing
-- test printen
 - kijk of treo filetjes al goed staan
 */
 
@@ -30,56 +24,6 @@ int log10(int num) {
   }
   return count;
 }
-
-
-class Producer {
-  public:
-    Producer(){}
-    ~Producer(){
-      reors_putter_destroy(&putter);
-    }
-    void setMembers(int a, CProtoHandle* proto, std::string name){
-      actions = a;
-      putter = reors_putter_claim(proto, const_cast<char*>(name.c_str()));
-    }
-    static void* call(void* ptr){
-      (static_cast<Producer*>(ptr))->put();
-    }
-
-  private:
-    void put(){
-      for(int act = 0; act < actions; act++){
-        void* from = (void*) &act;
-        reors_putter_put(&putter, from);
-      }
-    }
-    int actions;
-    CPutter putter;
-};
-
-class Consumer {
-  public:
-    Consumer(){}
-    ~Consumer(){
-      reors_getter_destroy(&getter);
-    }
-    void setMembers(int a, CProtoHandle* proto, std::string name){
-      actions = a;
-      getter = reors_getter_claim(proto, const_cast<char*>(name.c_str()));
-    }
-    static void* call(void* ptr){
-      (static_cast<Consumer*>(ptr))->get();
-    }
-
-  private:
-    void get(){
-      for(int act = 0; act < actions; act++){
-        reors_getter_get(&getter);
-      }
-    }
-    int actions;
-    CGetter getter;
-};
 
 int main(int argc, char** argv) {
   if(argc < 5) {
@@ -107,11 +51,11 @@ int main(int argc, char** argv) {
   // bind names to logical ports and bind ports to threads
   char prod[] = "p_";
   char con[] = "x_";
-  char res[2+log10(maxint(p,c)+1)+1];
-  char number[log10(maxint(p,c)+1)+1];
+  char* res = (char*) malloc((2+log10(std::max(p,c)+1)+1) * sizeof(char));
+  char* number = (char*) malloc((log10(std::max(p,c)+1)+1) * sizeof(char));
 
   for(int i = 0; i < p; i++){
-    sprintf(number,"%ld", i+1);
+    sprintf(number,"%d", i+1);
     strcpy(res, prod);
     strcat(res, number);
     prodthreads[i] = new pthread_t;
@@ -121,7 +65,7 @@ int main(int argc, char** argv) {
   }
 
   for(int i = 0; i < c; i++){
-    sprintf(number,"%ld", i+1);
+    sprintf(number,"%d", i+1);
     strcpy(res, con);
     strcat(res, number);
     conthreads[i] = new pthread_t;
@@ -151,6 +95,8 @@ int main(int argc, char** argv) {
   free(prodthreads);
   free(consumers);
   free(conthreads);
+  free(res);
+  free(number);
 
   reors_proto_handle_destroy(&proto);
 
