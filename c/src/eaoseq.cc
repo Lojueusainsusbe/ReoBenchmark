@@ -28,18 +28,12 @@ EAOSequence::~EAOSequence() {
 
 // Producer id does a put on the protocol
 void EAOSequence::put(int id, int data) {
-	// if(turn != 0) {
-		pthread_mutex_lock(&buf_lock);
-		pthread_cond_wait(&buf_cond, &buf_lock);
-	// }
+	pthread_mutex_lock(&buf_lock);
+	pthread_cond_wait(&buf_cond, &buf_lock);
 
   buff = turn;
 
-	// if(turn != 0)
-		pthread_mutex_unlock(&buf_lock);
-
-	// if(turn == 0)
-	 // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	pthread_mutex_unlock(&buf_lock);
 
 	pthread_cond_signal(&c_conds[(turn++)%N]);
 }
