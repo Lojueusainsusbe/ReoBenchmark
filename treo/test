@@ -13,4 +13,4 @@ fi
 reo $proto.treo -p P:int=$2 C:int=$4 -t Rust
 ../rstosh $proto.rs
 make
-./treotest $1 $2 $3 $4 $5
+./treotest $2 $3 $4 $5

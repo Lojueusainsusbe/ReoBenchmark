@@ -1,3 +1,6 @@
+// reo_rs c interface header
+// source: https://github.com/sirkibsirkib/reo_rs
+
 #ifndef REORS_DEF
 #define REORS_DEF
 
