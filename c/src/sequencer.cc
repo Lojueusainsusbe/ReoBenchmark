@@ -49,7 +49,7 @@ void Sequence::put(int id, int data) {
 
 	// Pass turn to the next producer
 	turn = next;
-	pthread_mutex_unlock(locks[next]); //TODO rintse omdraaien?
+	pthread_mutex_unlock(locks[next]); 
 	pthread_cond_signal(conds[next]);
 }
 

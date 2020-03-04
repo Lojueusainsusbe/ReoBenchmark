@@ -15,11 +15,11 @@ Protocol* protocolFromString(std::string s, int Nprod, int Ncons) {
 		std::cerr << "Testing Sequencer with " << Nprod << " producers." << std::endl;
 		return new Sequence(Nprod);
 	}
-	else if(s == "earep") {
+	else if(s == "ear") {
 		std::cerr << "Testing EARep with " << Ncons << " consumers." << std::endl;
 		return new EARep(Ncons);
 	}
-	else if(s == "eaoseq") {
+	else if(s == "eao") {
 		std::cerr << "Testing EAOSequencer with " << Ncons << " consumers." << std::endl;
 		return new EAOSequence(Ncons);
 	}
@@ -42,22 +42,22 @@ void test(Protocol* p, int Nprod, int actProd, int Ncons, int actCons) {
 	// Start producing
 	for(int i = 0; i < Nprod; i++) {
 	    pthreads[i] = new pthread_t;
-			producers[i] = new Producer;
-			producers[i]->setMembers(i, p, actProd);
+		producers[i] = new Producer;
+		producers[i]->setMembers(i, p, actProd);
 	    pthread_create(pthreads[i], NULL, &Producer::call, producers[i]);
 	}
 
 	// Start consuming
 	for(int i = 0; i < Ncons; i++) {
-			cthreads[i] = new pthread_t;
-			consumers[i] = new Consumer;
-			consumers[i]->setMembers(i, p, actCons);
-			pthread_create(cthreads[i], NULL, &Consumer::call, consumers[i]);
+		cthreads[i] = new pthread_t;
+		consumers[i] = new Consumer;
+		consumers[i]->setMembers(i, p, actCons);
+		pthread_create(cthreads[i], NULL, &Consumer::call, consumers[i]);
 	}
 
 	// Join all the threads
 	for(int i = 0; i < Nprod; i++) {
-			pthread_join(*pthreads[i], NULL);
+		pthread_join(*pthreads[i], NULL);
 	}
 	for(int i = 0; i < Ncons; i++) {
 	    pthread_join(*cthreads[i], NULL);
@@ -70,12 +70,12 @@ void test(Protocol* p, int Nprod, int actProd, int Ncons, int actCons) {
 
 	// Cleanup
 	for(int i = 0; i < Nprod; i++) {
-			delete pthreads[i];
-			delete producers[i];
+		delete pthreads[i];
+		delete producers[i];
 	}
 	for(int i = 0; i < Ncons; i++) {
-			delete cthreads[i];
-			delete consumers[i];
+		delete cthreads[i];
+		delete consumers[i];
 	}
 	free(pthreads);
 	free(cthreads);
@@ -86,16 +86,16 @@ void test(Protocol* p, int Nprod, int actProd, int Ncons, int actCons) {
 
 int main(int argc, char** argv) {
   if(argc < 6) {
-		std::cerr << "Give a protocol, "
-		 					<< "number of producers, "
-							<< "a number of productions, "
-							<< "a number of consumers, "
-							<< "and a number of consumptions" << std::endl;
+		std::cerr 	<< "Give a protocol, "
+		 			<< "number of producers, "
+					<< "a number of productions, "
+					<< "a number of consumers, "
+					<< "and a number of consumptions" << std::endl;
 		return -1;
 	}
 	//NOTE EAOSequencer: for k consumers, consuming n items. produce k*n items
 
-  int Nprod = strtol(argv[2], NULL, 10);
+ 	int Nprod = strtol(argv[2], NULL, 10);
 	int actProd = strtol(argv[3], NULL, 10);
 	int Ncons = strtol(argv[4], NULL, 10);
 	int actCons = strtol(argv[5], NULL, 10);

@@ -38,7 +38,8 @@ class EAOSequence : public Protocol {
     pthread_barrier_t init_barrier;
 
     int N;
-    unsigned turn;
+    int turn;
+    bool full;
     int buff;
 };
 
