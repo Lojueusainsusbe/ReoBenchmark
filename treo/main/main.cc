@@ -1,20 +1,11 @@
 #include <thread>
 #include <chrono>
 #include <algorithm>
-//#include "assert.h"
+#include <iostream>
 
 #include "producer.h"
 #include "consumer.h"
 
-
-/*
-TODO
-- schrijf wrappertje:
-  vorm ./test alt 3 3 3 3
-  alt, ear/rep?, seq
-- Timing
-- kijk of treo filetjes al goed staan
-*/
 
 int log10(int num) {
   int count = 1;
@@ -54,6 +45,9 @@ int main(int argc, char** argv) {
   char* res = (char*) malloc((2+log10(std::max(p,c)+1)+1) * sizeof(char));
   char* number = (char*) malloc((log10(std::max(p,c)+1)+1) * sizeof(char));
 
+  auto tstart = std::chrono::high_resolution_clock::now();
+
+  // start producing
   for(int i = 0; i < p; i++){
     sprintf(number,"%d", i+1);
     strcpy(res, prod);
@@ -64,6 +58,7 @@ int main(int argc, char** argv) {
     pthread_create(prodthreads[i], NULL, &Producer::call, producers[i]);
   }
 
+  // start consuming
   for(int i = 0; i < c; i++){
     sprintf(number,"%d", i+1);
     strcpy(res, con);
@@ -73,6 +68,11 @@ int main(int argc, char** argv) {
     consumers[i]->setMembers(cactions, &proto, res);
     pthread_create(conthreads[i], NULL, &Consumer::call, consumers[i]);
   }
+
+  // Timing
+	auto tend = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> diff = tend-tstart;
+	std::cout << diff.count() << std::endl;
 
   // cleanup
   for(int i = 0; i < p; i++)
