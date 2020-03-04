@@ -10,7 +10,7 @@ if [[ $1 == "ear" ]]; then
     proto="EarlyAsyncReplicator"
 fi
 
-reo $proto.treo -p P:int=$2 C:int=$4 -t Rust
+reo treo/$proto.treo -p P:int=$2 C:int=$4 -t Rust
 ../rstosh $proto.rs
 make
 ./treotest $2 $3 $4 $5

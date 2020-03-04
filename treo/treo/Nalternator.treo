@@ -3,16 +3,15 @@ import reo.sync;
 import reo.fifo1;
 
 
-Nalternator<N:int>(p[1..N]?,x[1]!){
+Nalternator<P:int,C:int>(p[1..P]?,x[1..C]!){
 	{
 		syncdrain(p[i-1],p[i])
 		sync(p[i],x[i])
 		fifo1(x[i],x[i-1])
 	|
-		i:<2..N>
+		i:<2..P>
 	}
 
      sync(p[1],x[1])
 
 }
-

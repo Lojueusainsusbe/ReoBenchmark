@@ -3,15 +3,15 @@ import reo.fifofull;
 import reo.sync;
 import reo.syncdrain;
 
-Nsequencer<N:int>(p[1..N]?) {
+Nsequencer<P:int,C:int>(p[1..P]?) {
 	{
   		fifo1(x[i], x[i+1])
 		syncdrain(x[i+1], p[i])
-	| 
-    	i : <2..N>
+	|
+    	i : <2..P>
   	}
 
 	fifofull<"0">(x[1], x[2])
 	syncdrain(x[2],p[1])
-	sync(x[N+1], x[1])
+	sync(x[P+1], x[1])
 }
