@@ -1,6 +1,6 @@
-section{Implementation}
+\section{Implementation}
 
-We designed our own Implementations of these protocols as classes in C++.
+We designed our own Implementations of these protocols as classes in C\texttt{++}.
 The classes have a put() and get() function that behave just like a put and get to a port in a Reo protocol.
 We made sure that a thread blocks and conintues in the put() and get() functions just like a Reo protocol would block when getting and putting.
 To actually implement the protocol's logic, we used the POSIX threads library.
