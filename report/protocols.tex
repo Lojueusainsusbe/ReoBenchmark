@@ -7,9 +7,9 @@ This protocol ensures that N producers fire in a cyclic sequence.\\
 It has the following data stream semantics:\\
 %
 $
-Sequencer{<}N{>}(\langle \alpha_0, a_0 \rangle \langle \alpha_1, a_1 \rangle... \langle \alpha_{N-1}, a_{N-1} \rangle) \equiv \\
+Sequencer{<}N{>}(\langle \alpha_0, a_0 \rangle, \langle \alpha_1, a_1 \rangle,\;...\; \langle \alpha_{N-1}, a_{N-1} \rangle) \equiv \\
 \hphantom \qquad  \alpha_0(0) < \alpha_1(0) < ... < \alpha_{N-1}(0) < \alpha_0(1) \\
-\hphantom \qquad Sequencer{<}N{>}(\langle \alpha_0', a_0' \rangle \langle \alpha_1', a_1' \rangle... \langle \alpha_{N-1}', a_{N-1}' \rangle)
+\hphantom \qquad Sequencer{<}N{>}(\langle \alpha_0', a_0' \rangle, \langle \alpha_1', a_1' \rangle,\;...\; \langle \alpha_{N-1}', a_{N-1}' \rangle)
 $
 
 
@@ -23,10 +23,10 @@ Only after all data has been consumed, may the producers fire again.\\
 It has the following data stream semantics:\\
 %
 $
-Alternator{<}N{>}(\langle \alpha_0, a_0 \rangle \langle \alpha_1, a_1 \rangle... \langle \alpha_{N-1}, a_{N-1} \rangle, \langle \beta, b \rangle) \equiv\\
+Alternator{<}N{>}(\langle \alpha_0, a_0 \rangle, \langle \alpha_1, a_1 \rangle,\; ... \; \langle \alpha_{N-1}, a_{N-1} \rangle; \langle \beta, b \rangle) \equiv\\
 \hphantom \qquad \alpha_0(0) = \alpha_1(0) = ... = \alpha_{N-1}(0) = \beta(0) < \beta(1) < ... < \beta(N-1) < \alpha_0(1) \\
 \hphantom \qquad\forall 0 \leq i < N : b(i) = a_i(0) \\
-\hphantom \qquad Alternator{<}N{>}(\langle \alpha_0', a_0' \rangle \langle \alpha_1', a_1' \rangle... \langle \alpha_{N-1}', a_{N-1}' \rangle, \langle \beta(N,...), b(N,...) \rangle)
+\hphantom \qquad Alternator{<}N{>}(\langle \alpha_0', a_0' \rangle, \langle \alpha_1', a_1' \rangle,\;...\; \langle \alpha_{N-1}', a_{N-1}' \rangle; \langle \beta(N,...), b(N,...) \rangle)
 $
 
 \subsection{Early Async Replicator}
@@ -38,7 +38,20 @@ All consumers fire simultaneously, but strictly after the producer.\\
 It has the following data stream semantics:\\
 %
 $
-EARep(\langle \alpha, a \rangle, \langle \beta_0, b_0 \rangle \langle \beta_1, b_1 \rangle... \langle \beta_{N-1}, b_{N-1} \rangle) \equiv \\
+EARep{<}N{>}(\langle \alpha, a \rangle ; \langle \beta_0, b_0 \rangle, \langle \beta_1, b_1 \rangle,\; ... \; \langle \beta_{N-1}, b_{N-1} \rangle) \equiv \\
 \hphantom \qquad \forall 0 \leq i < N : \alpha(0) < \beta_i(0) < \alpha(1) \land a(0) = b_i(0) \\
 \hphantom \qquad\forall 0 \leq i < N : \forall 0 \leq i < N : \beta_i(0) = \beta_j(0)
 $\\
+
+\subsection{Early Async Out Sequencer}
+Given one producer and multiple consumers, this protocol saves a production to a buffer and then directs it to one consumer. The consumer which receives the message changes for each production, visiting every consumer in a predefined sequence.\\
+
+\includegraphics[]{img/EAOSeq.png}\\
+%
+It has the following data stream semantics:\\
+%
+$
+EAOSequencer{<}N{>}(\langle \alpha, a \rangle;\langle \beta_0, b_0 \rangle, \langle \beta_1, b_1 \rangle,\;...\; \langle \beta_{N-1}, b_{N-1} \rangle) \equiv \\
+\hphantom \qquad \alpha(0) < \beta_0(0) < \alpha(1) \land a(0) = b_0(0) \\
+\hphantom \qquad EAOSequencer{<}N{>}(\langle \alpha', a' \rangle; \langle \beta_1, b_1 \rangle,\langle \beta_2, b_2 \rangle,\;...\; \langle \beta_{N-1}, b_{N-1} \rangle, \langle \beta_0', b_0' \rangle)
+$
