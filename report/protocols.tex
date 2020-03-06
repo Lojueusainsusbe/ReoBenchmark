@@ -2,7 +2,7 @@
 \subsection{Sequencer}
 This protocol ensures that N producers fire in a cyclic sequence.\\
 
-\includegraphics[]{img/seq.png}\\
+\includegraphics[width=5cm]{img/seq.png}\\
 %
 It has the following data stream semantics:\\
 %
@@ -18,7 +18,7 @@ This protocol waits for all N inputs to put and the one output to get, after whi
 All the other producers have their output buffered, and consumed one by one in a set order.
 Only after all data has been consumed, may the producers fire again.\\
 
-\includegraphics[]{img/alt.png}\\
+\includegraphics[width=5cm]{img/alt.png}\\
 %
 It has the following data stream semantics:\\
 %
@@ -33,7 +33,7 @@ $
 This protocol has one producer, whose data is buffered when put, and $N$ consumers, which all replicate the producers data.
 All consumers fire simultaneously, but strictly after the producer.\\
 
-\includegraphics[]{img/EARep.png}\\
+\includegraphics[width=5cm]{img/EARep.png}\\
 %
 It has the following data stream semantics:\\
 %
