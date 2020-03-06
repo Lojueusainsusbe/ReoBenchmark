@@ -9,3 +9,10 @@ c/test
 # java
 *.class
 *.java
+
+*.aux
+*.tex
+*.pdf
+*.bbl
+*.blg
+*.log
