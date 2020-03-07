@@ -1,7 +1,7 @@
 \section{Protocols}
 \subsection{Sequencer}%
 \begin{minipage}{.65\textwidth}
-  This protocol ensures that N producers fire in a cyclic sequence.\\
+  This protocol ensures that N producers fire in a cyclic sequence.\\\\
   %
   It has the following data stream semantics:\\\\
   %
@@ -19,7 +19,7 @@
 \begin{minipage}{.65\textwidth}
   This protocol waits for all N inputs to put and the one output to get, after which the data of the first producer is instantly consumed.
   All the other producers have their output buffered, and consumed one by one in a set order.
-  Only after all data has been consumed, may the producers fire again.\\
+  Only after all data has been consumed, may the producers fire again.\\\\
   %
   It has the following data stream semantics:\\\\
   %
@@ -39,7 +39,7 @@
 \subsection{Early Async Replicator}
 \begin{minipage}{.65\textwidth}
   This protocol has one producer, whose data is buffered when put, and $N$ consumers, which all replicate the producers data.
-  All consumers fire simultaneously, but strictly after the producer.\\
+  All consumers fire simultaneously, but strictly after the producer.\\\\
   %
   It has the following data stream semantics:\\\\
   %
@@ -47,8 +47,7 @@
   \vspace{0.2cm}\earep (\langle \alpha, a \rangle ; \langle \beta_0, b_0 \rangle, \langle \beta_1, b_1 \rangle,\; ... \; \langle \beta_{\textbf{N}-1}, b_{\textbf{N}-1} \rangle) \equiv \\
   \vspace{0.2cm} \hphantom \qquad \forall 0 \leq i < \textbf{N} : \quad \alpha(0) < \beta_i(0) < \alpha(1) \land a(0) = b_i(0) \\
   \hphantom \qquad\forall 0 \leq i < \textbf{N} :\quad \forall 0 \leq i < \textbf{N} : \beta_i(0) = \beta_j(0)
-  $\\
-
+  $
 \end{minipage}\hfill
 \begin{minipage}{.25\textwidth}
   \includegraphics[width=5cm]{img/EARep.png}\\
@@ -56,14 +55,14 @@
 
 \subsection{Early Async Out Sequencer}
 \begin{minipage}{.65\textwidth}
-  Given one producer and multiple consumers, this protocol saves a production to a buffer and then directs it to one consumer. The consumer which receives the message changes for each production, visiting every consumer in a predefined sequence.\\
+  Given one producer and multiple consumers, this protocol saves a production to a buffer and then directs it to one consumer. The consumer which receives the message changes after each production. All consumers are visited in a predefined sequence.\\\\
   %
   It has the following data stream semantics:\\\\
   %
   $
-  \vspace{0.2cm}\eaoseq (\langle \alpha, a \rangle;\langle \beta_0, b_0 \rangle, \langle \beta_1, b_1 \rangle,\;...\; \langle \beta_{\textbf{N}-1}, b_{\textbf{N}-1} \rangle) \equiv \\
+  \vspace{0.2cm}\eaoseq (\langle \alpha, a \rangle;\langle \beta_0, b_0 \rangle, \langle \beta_1, b_1 \rangle,\;...\; \langle \beta_{\textbf{N}-1}, b_{\textbf{N}-1} \rangle) \equiv
   \vspace{0.2cm} \hphantom \qquad \alpha(0) < \beta_0(0) < \alpha(1) \land a(0) = b_0(0) \\
-  \vspace{0.2cm} \hphantom \qquad \eaoseq (\langle \alpha', a' \rangle; \langle \beta_1, b_1 \rangle,\langle \beta_2, b_2 \rangle,\;...\; \langle \beta_{\textbf{N}-1}, b_{\textbf{N}-1} \rangle, \langle \beta_0', b_0' \rangle)
+  \hphantom \qquad \eaoseq (\langle \alpha', a' \rangle; \langle \beta_1, b_1 \rangle,\langle \beta_2, b_2 \rangle,\;...\; \langle \beta_{\textbf{N}-1}, b_{\textbf{N}-1} \rangle, \langle \beta_0', b_0' \rangle)
   $
 \end{minipage}\hspace{0.05cm}
 \begin{minipage}{.25\textwidth}

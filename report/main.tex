@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{verbatim}
 
 \DeclareMathOperator{\sequencer}{\textbf{Sequencer}{<}\textbf{N}{>}}
 \DeclareMathOperator{\alternator}{\textbf{Alternator}{<}\textbf{N}{>}}
@@ -17,13 +18,12 @@
 
 \maketitle
 
-%TODO? \input ipv \include insert the .tex file op dezelfde page
-\include{introduction}
-\include{protocols}
-\include{materials}
-\include{implementation}
+\input{introduction}
+\input{protocols}
+\input{materials}
+\input{implementation}
 \include{experiments}
-\include{conclusion}
+\input{conclusion}
 
 \newpage
 \bibliographystyle{alpha}
