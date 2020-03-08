@@ -9,24 +9,21 @@ use reo_rs::{Instruction::*, Term::*};
 
 #[no_mangle]
 pub extern fn reors_generated_proto_create() -> CProtoHandle {
-    reo_rs::to_c_proto(proto_protocol1_build_rust::<isize,isize,isize,isize>())
+    reo_rs::to_c_proto(proto_protocol1_build_rust::<isize,isize,isize>())
 }
 
-pub fn proto_protocol1_build_rust<T0, T1, T2, T3>(
+pub fn proto_protocol1_build_rust<T0, T1, T2>(
 ) -> ProtoHandle
 where
     T0: 'static + Send + Sync + Sized,
     T1: 'static + Send + Sync + Sized,
     T2: 'static + Send + Sync + Sized,
-    T3: 'static + Send + Sync + Sized,
 {
     let name_defs = hashmap!{
         "p_2" => Port { is_putter:  true, type_info: TypeInfo::of::<T0>() },
-        "p_1" => Port { is_putter:  true, type_info: TypeInfo::of::<T1>() },
-        "p_3" => Port { is_putter:  true, type_info: TypeInfo::of::<T2>() },
-        "m1" => Mem(TypeInfo::of::<T3>()),
-        "m2" => Mem(TypeInfo::of::<T3>()),
-        "m3" => Mem(TypeInfo::of::<T3>()),
+        "p_1" => Port { is_putter:  true, type_info: TypeInfo::of::<T2>() },
+        "m1" => Mem(TypeInfo::of::<T1>()),
+        "m2" => Mem(TypeInfo::of::<T1>()),
     };
     let rules = vec![
         RuleDef {
@@ -44,36 +41,22 @@ where
         },
         RuleDef {
             state_guard: StatePredicate {
-                ready_ports: hashset! {"p_3", },
-                full_mem: hashset! {"m2", },
-                empty_mem: hashset! {"m3", },
-            },
-            ins: vec![
-            ],
-            output: hashmap!{
-                "m2" => (false, hashset!{"m3", }),
-                "p_3" => (false, hashset!{}),
-            }
-        },
-        RuleDef {
-            state_guard: StatePredicate {
                 ready_ports: hashset! {"p_1", },
-                full_mem: hashset! {"m3", },
+                full_mem: hashset! {"m2", },
                 empty_mem: hashset! {"m1", },
             },
             ins: vec![
             ],
             output: hashmap!{
                 "p_1" => (false, hashset!{}),
-                "m3" => (false, hashset!{"m1", }),
+                "m2" => (false, hashset!{"m1", }),
             }
         },
     ];
     let mem_init = MemInitial::default()
-        .with<T3>("m3", ""0"".into());
+        .with::<T1>::("m2", "0".into());
     ProtoDef {
         name_defs,
         rules
     }.build(mem_init).expect("Oh no! Reo failed to build!")
 }
-
