@@ -1,7 +1,10 @@
 #!/bin/bash
 
+rewrite=false
+
 if [[ $1 == "seq" ]]; then
     proto="Nsequencer"
+    rewrite=true
 fi
 if [[ $1 == "alt" ]]; then
     proto="Nalternator"
@@ -11,6 +14,11 @@ if [[ $1 == "ear" ]]; then
 fi
 
 reo treo/$proto.treo -p P:int=$2 C:int=$4 -t Rust
+
+if [[ "$rewrite" = true ]]; then
+  python3 nseqscript.py
+fi
+
 ../rstosh $proto.rs
 make
 ./treotest $2 $3 $4 $5
