@@ -12,14 +12,14 @@ CC				= g++
 CFLAGS			= -std=c++11 -pthread -O3 -Wall
 CPPFLAGS 		= $(addprefix -I, $(INC_DIR)) -pedantic
 RUSTOBJ 		= ./protocol.so
-
+LIBPATH 		= -Wl,-rpath=.
 
 .PHONY: all clean
 
 all: $(MAIN_TARGET)
 
 $(MAIN_TARGET): $(OBJECTS) $(MAIN_OBJ) $(RUSTOBJ)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^ $(LIBPATH)
 -include $(MAIN_DEPS) $(DEPS)
 
 %.o: %.cc
