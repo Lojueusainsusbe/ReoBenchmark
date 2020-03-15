@@ -1,0 +1,49 @@
+import sys
+from enum import Enum
+
+runs=25
+actions=10000
+sizes=[4,16,64,256,512,1024]
+
+protocols=["alt", "eao", "ear", "seq"]
+
+def det_producer(prot, size):
+    if prot == "alt" or prot == "seq":
+        return size
+    return 1
+
+def det_consumer(prot, size):
+    if prot == "seq":
+        return 0
+    if prot == "alt":
+        return 1https://www.learnpython.org/en/Multiple_Function_Arguments
+    return size
+
+def det_productions(prot, size, action):
+    if prot == "eao":
+        return action*size
+    return action
+
+def det_consumptions(prot, size, action):
+    if prot == "seq":
+        return 0
+    if prot == "alt":
+        return action*size
+    return action
+
+
+for prot in protocols:
+    for size in sizes:
+        ctime = 0
+        ttime = 0
+        producer
+        for run in range(runs):
+            # C
+            ctime += subprocess.check_output(['./../c/test',....])
+
+            # Treo
+            ttime += subprocess.check_output(['./../treo/test',.....])
+
+        ctime = ctime / runs
+        ttime = ttime / runs
+

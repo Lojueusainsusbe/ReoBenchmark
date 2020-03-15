@@ -13,12 +13,12 @@ if [[ $1 == "ear" ]]; then
     proto="EarlyAsyncReplicator"
 fi
 
-reo treo/$proto.treo -p P:int=$2 C:int=$4 -t Rust
+java -jar ~/reo/bin/reo-1.0.jar treo/$proto.treo -p P:int=$2 C:int=$4 -t Rust
 
 if [[ "$rewrite" = true ]]; then
-  python3 nseqscript.py
+  python3 ~/bench/treo/nseqscript.py
 fi
 
-../rstosh $proto.rs
+~/bench/rstosh $proto.rs
 make
-./treotest $2 $3 $4 $5
+~/bench/treo/treotest $2 $3 $4 $5
