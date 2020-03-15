@@ -11,15 +11,15 @@ MAIN_TARGET 	= treotest
 CC				= g++
 CFLAGS			= -std=c++11 -pthread -O3 -Wall
 CPPFLAGS 		= $(addprefix -I, $(INC_DIR)) -pedantic
-RUSTLIB     = ./protocol.so
+RUSTOBJ 		= ./protocol.so
 
 
 .PHONY: all clean
 
 all: $(MAIN_TARGET)
 
-$(MAIN_TARGET): $(OBJECTS) $(MAIN_OBJ)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(RUSTLIB) -o $@ $^
+$(MAIN_TARGET): $(OBJECTS) $(MAIN_OBJ) $(RUSTOBJ)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^
 -include $(MAIN_DEPS) $(DEPS)
 
 %.o: %.cc

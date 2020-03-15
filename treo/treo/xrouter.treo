@@ -1,8 +1,0 @@
-import reo.sync;
-import reo.syncdrain;
-import reo.lossy;
-
-xrouter<N:int>(p[1], x[1..N]) {
-  sync(p[1], s) syncdrain(s, m)
-  {lossy(s, y[i]) sync(y[i], m) sync(y[i], x[i]) | i:<1..N> }
-}

@@ -3,6 +3,10 @@
 #include <algorithm>
 #include <iostream>
 
+extern "C"{
+  #include "reo_rs_ext.h"
+}
+
 #include "producer.h"
 #include "consumer.h"
 

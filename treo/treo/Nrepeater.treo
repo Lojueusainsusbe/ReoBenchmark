@@ -1,9 +1,0 @@
-import reo.fifo1;
-
-Nrepeater<N:int>(a, b) {
-	{
-		fifo1(a, b)
-	|
-		i : <1..N>
-	}
-}
