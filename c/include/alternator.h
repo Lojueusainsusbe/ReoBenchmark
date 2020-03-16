@@ -18,9 +18,9 @@ class Alternate : public Protocol {
 		~Alternate();
 
 		// Corresponds to Reo putter
-		void put(int id, int d) override;
+		void put(int id, int* d) override;
 		// Corresponds to Reo getter
-		int get(int id) override;
+		int* get(int id) override;
 
 	private:
 		// Barriers
@@ -28,7 +28,7 @@ class Alternate : public Protocol {
 		pthread_barrier_t allputbarrier;
 
 		int dataidx;
-		int* data;
+		int** data;
 		int actors;
 };
 

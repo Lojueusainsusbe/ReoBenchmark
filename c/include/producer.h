@@ -5,11 +5,13 @@
 
 class Producer : public IO {
 	public:
-		Producer();
+		Producer(int* d);
 	 	~Producer();
 	protected:
     //produce
         void act() override;
+	private:
+		int* data;
 };
 
 #endif

@@ -29,7 +29,7 @@ EAOSequence::~EAOSequence() {
 }
 
 // Producer id does a put on the protocol
-void EAOSequence::put(int id, int data) {
+void EAOSequence::put(int id, int* data) {
 	pthread_mutex_lock(&buf_lock);
 	if(full) {
 		pthread_cond_wait(&buf_cond, &buf_lock);
@@ -48,7 +48,7 @@ void EAOSequence::put(int id, int data) {
 	pthread_cond_signal(&c_conds[next]);
 }
 
-int EAOSequence::get(int id) {
+int* EAOSequence::get(int id) {
 	pthread_mutex_lock(&c_locks[id]);
 	if(id != turn || !full) {
     	pthread_cond_wait(&c_conds[id], &c_locks[id]);
@@ -57,7 +57,7 @@ int EAOSequence::get(int id) {
 
 	pthread_mutex_lock(&buf_lock);
 
-  	int temp = buff;
+  	int* temp = buff;
 	full = false;
 
 	pthread_mutex_unlock(&buf_lock);

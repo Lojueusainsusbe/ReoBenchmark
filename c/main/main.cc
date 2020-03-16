@@ -31,6 +31,8 @@ Protocol* protocolFromString(std::string s, int Nprod, int Ncons) {
 
 
 void test(Protocol* p, int Nprod, int actProd, int Ncons, int actCons) {
+	int data = 1;	
+	
 	Producer** producers = (Producer**) malloc(Nprod * sizeof(Producer*));
 	Consumer** consumers = (Consumer**) malloc(Ncons * sizeof(Consumer*));
 
@@ -42,7 +44,7 @@ void test(Protocol* p, int Nprod, int actProd, int Ncons, int actCons) {
 	// Start producing
 	for(int i = 0; i < Nprod; i++) {
 	    pthreads[i] = new pthread_t;
-		producers[i] = new Producer;
+		producers[i] = new Producer(&data);
 		producers[i]->setMembers(i, p, actProd);
 	    pthread_create(pthreads[i], NULL, &Producer::call, producers[i]);
 	}
@@ -93,7 +95,6 @@ int main(int argc, char** argv) {
 					<< "and a number of consumptions" << std::endl;
 		return -1;
 	}
-	//NOTE EAOSequencer: for k consumers, consuming n items. produce k*n items
 
  	int Nprod = strtol(argv[2], NULL, 10);
 	int actProd = strtol(argv[3], NULL, 10);

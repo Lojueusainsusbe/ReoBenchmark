@@ -32,7 +32,7 @@ Sequence::~Sequence() {
 }
 
 // Producer id does a put on the protocol
-void Sequence::put(int id, int data) {
+void Sequence::put(int id, int* data) {
 	// Atomically check whether its your turn
 	pthread_mutex_lock(locks[id]);
 	if(id != turn) {
@@ -45,7 +45,6 @@ void Sequence::put(int id, int data) {
 	pthread_mutex_lock(locks[next]);
 
 	// Critical section
-	buff = data;
 
 	// Pass turn to the next producer
 	turn = next;
@@ -53,6 +52,6 @@ void Sequence::put(int id, int data) {
 	pthread_cond_signal(conds[next]);
 }
 
-int Sequence::get(int id) {
+int* Sequence::get(int id) {
 	return 0;
 }

@@ -16,9 +16,9 @@ class EARep : public Protocol{
 		EARep(int n);
 		~EARep();
 
-		void put(int data, int id) override;
+		void put(int id, int* data) override;
 
-		int get(int id) override;
+		int* get(int id) override;
 
 	private:
 		//Barrier
@@ -33,7 +33,8 @@ class EARep : public Protocol{
 		pthread_mutex_t prodlock;
 		pthread_mutex_t countlock;
 
-		int buff, N, count;
+		int* buff;
+		int N, count;
 		bool fifo;
 };
 

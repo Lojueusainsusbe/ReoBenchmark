@@ -9,7 +9,7 @@
 #include "alternator.h"
 
 Alternate::Alternate(int n) {
-	data = (int*) malloc(n*sizeof(int));
+	data = (int**) malloc(n*sizeof(int*));
 	dataidx = 0;
 	actors = n+1;
 
@@ -22,16 +22,15 @@ Alternate::~Alternate() {
 	free(data);
 }
 
-
 // Corresponds to Reo putter
-void Alternate::put(int id, int d) {
+void Alternate::put(int id, int* d) {
 	pthread_barrier_wait(&alltriedbarrier);
 	data[id] = d;
 	pthread_barrier_wait(&allputbarrier);
 }
 
 // Corresponds to Reo getter
-int Alternate::get(int id) {
+int* Alternate::get(int id) {
 	if(dataidx == 0) {
 		pthread_barrier_wait(&alltriedbarrier);
 	}
@@ -41,7 +40,7 @@ int Alternate::get(int id) {
 		pthread_barrier_wait(&allputbarrier);
 	}
 
-	int dat = data[dataidx++];
+	int* dat = data[dataidx++];
 
 	// All the items have left the alternator
 	if(dataidx == actors-1) {

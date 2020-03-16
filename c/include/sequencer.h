@@ -19,16 +19,15 @@ class Sequence : public Protocol {
 		~Sequence();
 
 		// Producer id does a put on the protocol
-		void put(int id, int data) override;
+		void put(int id, int *data) override;
 
 		// This protocol does not have outputs
-		int get(int id) override;
+		int* get(int id) override;
 	private:
 		pthread_mutex_t** locks;
 		pthread_cond_t** conds;
 		int N;
 		int turn;
-		int buff;
 };
 
 #endif

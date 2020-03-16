@@ -9,8 +9,8 @@ Consumer::~Consumer() {}
 
 void Consumer::act() {
 	while(actions > 0) {
-		int data = protocol->get(id);
-		//mutLog(std::to_string(data));
+		int* data = protocol->get(id);
+		//mutLog(std::to_string(*data));
 		actions--;
 	}
 }

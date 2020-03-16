@@ -1,12 +1,14 @@
 #include "producer.h"
 #include "mutexprint.h"
 
-Producer::Producer() {}
+Producer::Producer(int* d) {
+	data = d;
+}
 Producer::~Producer() {}
 
 void Producer::act() {
 	while(actions > 0) {
-		protocol->put(id, actions);
+		protocol->put(id, data);
 		actions--;
 	}
 }

@@ -29,7 +29,7 @@ EARep::~EARep() {
 	free(conlocks);
 }
 
-void EARep::put(int id, int data) {
+void EARep::put(int id, int* data) {
 	// Check whether fifo is full (fifo = true),
 	// in other words whether its your turn
 	pthread_mutex_lock(&prodlock);
@@ -57,7 +57,7 @@ void EARep::put(int id, int data) {
 	}
 }
 
-int EARep::get(int id) {
+int* EARep::get(int id) {
 	int temp;
 
 	// Check whether fifo is empty (fifo = false),

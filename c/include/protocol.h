@@ -6,10 +6,10 @@ class Protocol {
 		Protocol(){}
 		virtual ~Protocol(){}
 		// Corresponds to Reo putter
-		virtual void put(int id, int d) = 0;
+		virtual void put(int id, int* d) = 0;
 
 		// Corresponds to Reo getter
-		virtual int get(int id) = 0;
+		virtual int* get(int id) = 0;
 };
 
 #endif
