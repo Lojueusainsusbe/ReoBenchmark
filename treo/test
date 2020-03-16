@@ -1,24 +1,7 @@
 #!/bin/bash
 
-rewrite=false
+cd ~/bench/treo/
 
-if [[ $1 == "seq" ]]; then
-    proto="Nsequencer"
-    rewrite=true
-fi
-if [[ $1 == "alt" ]]; then
-    proto="Nalternator"
-fi
-if [[ $1 == "ear" ]]; then
-    proto="EarlyAsyncReplicator"
-fi
+./treotest $1 $2 $3 $4
 
-java -jar ~/reo/bin/reo-1.0.jar treo/$proto.treo -p P:int=$2 C:int=$4 -t Rust
-
-if [[ "$rewrite" = true ]]; then
-  python3 ~/bench/treo/nseqscript.py
-fi
-
-~/bench/rstosh $proto.rs
-make
-~/bench/treo/treotest $2 $3 $4 $5
+cd ~/bench/tests

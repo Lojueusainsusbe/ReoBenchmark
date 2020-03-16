@@ -1,1 +1,16 @@
 alt 4 1 1 4
+size: 4, actions: 1
+average C time over 25 runs: 443.36
+average treo time over 25 runs: 198.68
+eao 1 4 4 1
+size: 4, actions: 1
+average C time over 25 runs: 438.96
+average treo time over 25 runs: 207.56
+ear 1 1 4 1
+size: 4, actions: 1
+average C time over 25 runs: 404.44
+average treo time over 25 runs: 221.0
+seq 4 1 0 0
+size: 4, actions: 1
+average C time over 25 runs: 246.64
+average treo time over 25 runs: 182.08

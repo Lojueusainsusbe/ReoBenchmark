@@ -104,6 +104,5 @@ int main(int argc, char** argv) {
 
   reors_proto_handle_destroy(&proto);
 
-	printf("Everything went fine\n");
-	return 0;
+  return 0;
 }

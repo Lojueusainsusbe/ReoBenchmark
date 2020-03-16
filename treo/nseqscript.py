@@ -1,7 +1,13 @@
 # script om de file om te schrijven
 import re
+from argparse import ArgumentParser
 
-rs = open("Nsequencer.rs", "r")
+parser = ArgumentParser()
+parser.add_argument("file", type=str, help="name of file to write results to")
+args = parser.parse_args()
+filename = args.file + ".rs"
+
+rs = open(filename, "r")
 
 rslines = rs.readlines()
 
@@ -34,7 +40,7 @@ rslines[rslines.index(line)] = line2
 
 rs.close()
 
-rsnew = open("Nsequencer.rs", "w")
+rsnew = open(filename, "w")
 
 rsnew.writelines(rslines)
 

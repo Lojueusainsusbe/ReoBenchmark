@@ -38,7 +38,7 @@ def det_consumptions (prot, size, actions):
     return actions
 
 def parse_output (time):
-    time = time[:-2] # remove endline
+    time = time[2:-4]
     return float(time)
 
 results = open(filename + ".txt", "w")
@@ -52,7 +52,11 @@ for prot in protocols:
         productions = str(det_productions(prot, size, actions))
         consumptions = str(det_consumptions(prot, size, actions))
 
-        results.write(prot + " " + numproducers + " " + productions + " " + numconsumers + " " + consumptions)
+        results.write(prot + " " + numproducers + " " + productions + " " + numconsumers + " " + consumptions + "\n")
+        results.write("size: " +  str(size) + ", actions: " + str(actions) + "\n")
+
+	# Make Treo executable
+        subprocess.run(['./../treo/make.sh', prot, numproducers, numconsumers])
 
         for run in range(runs):
             # C
@@ -60,14 +64,14 @@ for prot in protocols:
 
             ctime += parse_output(time)
             # Treo
-            time = subprocess.check_output(['./../treo/test', prot, numproducers, productions, numconsumers, consumptions])
+            time = subprocess.check_output(['./../treo/test', numproducers, productions, numconsumers, consumptions])
 
             ttime += parse_output(time)
 
         ctime = ctime / runs
         ttime = ttime / runs
 
-        results.write("average C time over " + str(runs) + " runs: " + str(ctime))
-        results.write("average treo time over " + str(runs) + " runs: " + str(ttime))
+        results.write("average C time over " + str(runs) + " runs: " + str(ctime) + "\n")
+        results.write("average treo time over " + str(runs) + " runs: " + str(ttime) + "\n")
 
 results.close()
