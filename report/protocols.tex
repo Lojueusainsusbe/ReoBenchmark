@@ -1,5 +1,5 @@
 \section{Protocols} \label{sec:protocols}
-We consider four protocols, representing different types of behavior. This section will describe this behaviour and provide a specification using both reo circuits \cite{puff} and timed-data-stream seamntics \cite{datastream}.
+We consider four protocols with different types of behaviour. This section will describe these protocols and provide a specification of their behaviour using both reo circuits \cite{puff} and timed-data-stream seamntics \cite{datastream}.
 
 \subsection{Sequencer}%
 \begin{minipage}{.65\textwidth}
@@ -57,7 +57,7 @@ We consider four protocols, representing different types of behavior. This secti
 
 \subsection{Early Async Out Sequencer}
 \begin{minipage}{.65\textwidth}
-  Given one producer and multiple consumers, this protocol saves a production to a buffer and then directs it to one consumer. The consumer which receives the message changes after each production. All consumers are visited in a predefined sequence.\\\\
+  Given one producer and multiple consumers, this protocol saves a production to a buffer and then directs it to one consumer. The consumers fire in a set order.\\\\
   %
   It has the following data stream semantics:\\\\
   %
