@@ -1,5 +1,16 @@
 \section{Experiments}
-The protocols from section \ref{sec:protocols} are implemented using Treo, section \ref{sec:treo}, for the exact implementation see \verb|treo/treo| in \cite{us:git}. The Rust source and C library are given a series of different sizes, which will scale the amount consumers or producers of a protocol. The Sequencer and Alternator will scale the amount of producers, as there is only a single output port and variable inputs. The Early Async Replicator and Early Async Out Sequencer only scale their consumers, since here the input is constant.\\
-The same will be done for our hand crafted C\texttt{++} code.\\\\
-%
-Due to issues with the compiler not all protocols and input sizes were able to be compiled and run. This report will contain all successful runs and omit the rest. The originally planned input parameters were a input/output size of 4, 16, 64, 256, 512, and 1024.
+NOTE: Due to issues with the compiler, not all protocols and input sizes we wanted to benchmark were able to be compiled and run. We report on the protocols we got to work, and omit the rest. \\
+
+\noindent We tested both the Rust-C ABI and our own C\texttt{++} code with different amounts of producers and consumers. We ran tests for the sizes 4, 16, 64, 256, 512 and 1024 for all protocols. Whether we scale the producers, consumers or both with this size varies from protocol to protocol. Each test is averaged over 25 runs to eliminate all run-by-run variance from our results. 
+
+\subsection{Sequencer}
+The sequencer has no consumers, and thus only the producer count is varied. Each producer produces 10000 times.
+
+\subsection{Alternator}
+The alternator has a fixed consumer count of one, but the producer count is varied. Each producer produces 10000 times. The amount of consumptions by the consumer is also varied to align with the total amount of productions.
+
+\subsection{EarlyAsyncReplicator}
+The EarlyAsyncReplicator has a fixed producer count of one, but the consumer count is varied. The producer produces 10000 times, and the consumers consume 10000 times each.
+
+\subsection{EarlyAsyncOutSequencer}
+The EarlyAsyncOutSequencer has a fixed producer count of one, but the consumer count is varied. Each consumer consumes 10000 times. The amount of productions by the producer is also varied to align with the total amount of consumptions.
