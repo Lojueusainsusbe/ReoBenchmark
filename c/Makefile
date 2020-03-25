@@ -12,7 +12,6 @@ CC				= g++
 CFLAGS			= -std=c++11 -pthread -O3 -Wall
 CPPFLAGS 		= $(addprefix -I, $(INC_DIR)) -pedantic
 
-
 .PHONY: all clean
 
 all: $(MAIN_TARGET)

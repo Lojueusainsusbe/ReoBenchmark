@@ -8,8 +8,8 @@ args = parser.parse_args()
 filename = args.file
 
 runs=25
-actions=1 #0000
-sizes=[4] #,16,64,256,512,1024]
+actions=10000
+sizes=[4,16,64,256,512,1024]
 
 protocols=["alt", "eao", "ear", "seq"]
 

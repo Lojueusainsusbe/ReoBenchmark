@@ -1,8 +1,0 @@
- 
- TODO
-
-- niet alles opnieuw compileren bij de 25 runs
-
-- output parsen enzo
-
-
