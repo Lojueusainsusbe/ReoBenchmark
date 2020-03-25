@@ -19,6 +19,7 @@ class Producer {
     void put();
 
     int actions;
+    int* data;
     CPutter putter;
 };
 

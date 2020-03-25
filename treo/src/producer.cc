@@ -17,7 +17,6 @@ void* Producer::call(void* ptr){
 }
 
 void Producer::put(){
-  int* data;
   for(int act = 0; act < actions; act++){
     data = new int(act);
     void* from = (void*) data;
