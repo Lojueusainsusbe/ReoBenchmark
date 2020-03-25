@@ -73,17 +73,17 @@ int main(int argc, char** argv) {
     pthread_create(conthreads[i], NULL, &Consumer::call, consumers[i]);
   }
 
-  // Timing
-	auto tend = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> diff = tend-tstart;
-	std::cout << diff.count() << std::endl;
-
   // cleanup
   for(int i = 0; i < p; i++)
     pthread_join(*prodthreads[i], NULL);
 
   for(int i = 0; i < c; i++)
     pthread_join(*conthreads[i], NULL);
+
+  // Timing
+	auto tend = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> diff = tend-tstart;
+	std::cout << diff.count() << std::endl;
 
   for(int i = 0; i < p; i++){
     delete producers[i];
