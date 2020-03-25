@@ -1,8 +1,9 @@
 \section{Materials}
 \subsection{Treo Compiler} \label{sec:treo}
-Reo protocols can be specified using its automata type circuits but in order convert a protocol into functioning code a textual representation is required. The Treo \cite{treo} compiler \cite{reo:git} converts a textual reo protocol into a target language and connects the input and output ports to code provided by the user.
+The Treo \cite{treo} compiler \cite{reo:git} converts a textual reo protocol into a target language.
 
 \subsection{Reo\_rs Compiler}
-The Reo Rs \cite{reors:git} allows textual reo protocols to determine data flow in Rust and C programs. It outputs a Rust source file or C library based on the supplied treo protocol.
+The Reo-rs compiler \cite{reors:git} outputs a shared object that can be interfaced with from C programs, through an ABI.
 
 \subsection{Hardware}
+We benchmarked our code on a machine with two Intel Xeon E5645 Hexacore CPUs, each with plenty of RAM. We disabled hyperthreading, and turbo boost to make the comparisons as fair as possible. 
