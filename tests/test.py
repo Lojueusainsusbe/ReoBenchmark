@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import re
 from argparse import ArgumentParser
 
 parser = ArgumentParser ()
@@ -9,9 +10,9 @@ filename = args.file
 
 runs=25
 actions=10000
-sizes=[4,16,64,256,512,1024]
+sizes= [4,16,64,256,512,1024]
 
-protocols=["alt", "eao", "ear", "seq"]
+protocols=["seq"] #["alt", "eao", "ear", "seq"]
 
 def det_producer (prot, size):
     if prot == "alt" or prot == "seq":
@@ -38,7 +39,8 @@ def det_consumptions (prot, size, actions):
     return actions
 
 def parse_output (time):
-    time = time[2:-4]
+    time = time.decode()
+    print(time)
     return float(time)
 
 results = open(filename + ".txt", "w")
