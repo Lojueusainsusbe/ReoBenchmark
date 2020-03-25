@@ -1,1 +1,5 @@
 \section{Experiments}
+The protocols from section \ref{sec:protocols} are implemented using Treo, section \ref{sec:treo}, for the exact implementation see \verb|treo/treo| in \cite{us:git}. The Rust source and C library are given a series of different sizes, which will scale the amount consumers or producers of a protocol. The Sequencer and Alternator will scale the amount of producers, as there is only a single output port and variable inputs. The Early Async Replicator and Early Async Out Sequencer only scale their consumers, since here the input is constant.\\
+The same will be done for our hand crafted C\texttt{++} code.\\\\
+%
+Due to issues with the compiler not all protocols and input sizes were able to be compiled and run. This report will contain all successful runs and omit the rest. The originally planned input parameters were a input/output size of 4, 16, 64, 256, 512, and 1024.

@@ -3,5 +3,5 @@
 We designed our own Implementations of these protocols as classes in C\texttt{++}.
 They are derived from a Protocol interface class that has a virtual \verb|put()| and \verb|get()| function. A Protocol is passed to a Consumer and Producer that call these functions as if they were a put and get port in a Reo protocol. The specific implementation of these functions define the behavior of the protocol.\\\\
 %
-A thread only blocks and continues within the put() and get() functions, similar to how a Reo protocol would block when getting and putting.
+A thread only blocks and continues within the \verb|put()| and \verb|get()| functions, similar to how a Reo protocol would block when getting and putting.
 To actually implement the protocol's logic, we used the POSIX threads library\cite{pthreads}. This low level threading library would most likely be used in any application where speed is of importance. The exact implementation can be found in the \verb|c/src| folder \cite{us:git}.
