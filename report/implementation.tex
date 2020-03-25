@@ -1,7 +1,5 @@
 \section{Implementation}
 
-We designed our own Implementations of these protocols as classes in C\texttt{++}.
-They are derived from a Protocol interface class that has a virtual \verb|put()| and \verb|get()| function. A Protocol is passed to a Consumer and Producer that call these functions as if they were a put and get port in a Reo protocol. The specific implementation of these functions define the behavior of the protocol.\\\\
+We designed our C\texttt{++} framework such that interactions between objects closely resemble interactions between Reo components. To this end, we made classes for producers, consumers and protocols. The producers and consumers interact with the protocols through \verb|get()| and \verb|put()| functions, that mimic the get and put behaviour seen in Reo.\\\\
 %
-A thread only blocks and continues within the \verb|put()| and \verb|get()| functions, similar to how a Reo protocol would block when getting and putting.
-To actually implement the protocol's logic, we used the POSIX threads library\cite{pthreads}. This low level threading library would most likely be used in any application where speed is of importance. The exact implementation can be found in the \verb|c/src| folder \cite{us:git}.
+To actually implement the protocol's logic, we used the POSIX threads library\cite{pthreads}. This low level threading library would most likely be used in any application where speed is of importance. The exact protocol implementations can be found in the \verb|c/src| folder \cite{us:git}.
