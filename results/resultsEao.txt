@@ -1,0 +1,12 @@
+EARLY ASYNC OUT SEQUENCER
+SIZES: 4,16
+
+eao 1 40000 4 10000
+size: 4, actions: 10000
+average C time over 10 runs: 1.3466524
+average treo time over 10 runs: 0.9987709
+eao 1 160000 16 10000
+size: 16, actions: 10000
+average C time over 10 runs: 1.8312259999999998
+average treo time over 10 runs: 3.221851
+

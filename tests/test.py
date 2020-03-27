@@ -8,11 +8,11 @@ parser.add_argument("file", type=str, help="name of file to write results to")
 args = parser.parse_args()
 filename = args.file
 
-runs=25
+runs=10
 actions=10000
-sizes= [256,512] #[4,16,64,256,512,1024]
+sizes= [4] # ,16,64,256] # 512,1024]
 
-protocols=["seq"] #["alt", "eao", "ear", "seq"]
+protocols=["alt"] #["alt", "eao", "ear", "seq"]
 
 def det_producer (prot, size):
     if prot == "alt" or prot == "seq":

@@ -1,0 +1,26 @@
+SEQUENCER
+SIZES: 4,16,64,256,512
+
+seq 4 10000 0 0
+size: 4, actions: 10000
+average C time over 25 runs: 0.21345524000000002
+average treo time over 25 runs: 0.026564891999999996
+seq 16 10000 0 0
+size: 16, actions: 10000
+average C time over 25 runs: 10.21136
+average treo time over 25 runs: 1.3540224
+seq 64 10000 0 0
+size: 64, actions: 10000
+average C time over 25 runs: 43.723728
+average treo time over 25 runs: 34.594992000000005
+seq 256 10000 0 0
+size: 256, actions: 10000
+seq 256 10000 0 0
+size: 256, actions: 10000
+average C time over 25 runs: 180.61084000000002
+average treo time over 25 runs: 254.18811999999997
+seq 512 10000 0 0
+size: 512, actions: 10000
+average C time over 10 runs: 368.20220000000006
+average treo time over 10 runs: 761.9696999999999
+

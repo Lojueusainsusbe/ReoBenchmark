@@ -1,0 +1,8 @@
+ALTERNATOR
+SIZES: 4
+
+alt 4 10000 1 40000
+size: 4, actions: 10000
+average C time over 10 runs: 0.2317443
+average treo time over 10 runs: 0.2843876
+

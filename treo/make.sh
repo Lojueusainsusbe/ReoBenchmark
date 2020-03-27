@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ~/bench/treo
+cd /home/rijeun/bench/treo
 
 make clean
 
@@ -21,14 +21,14 @@ if [[ $1 == "eao" ]]; then
     rewrite=true
 fi
 
-java -jar ~/reo/bin/reo-1.0.jar ~/bench/treo/treo/$proto.treo -p P:int=$2 C:int=$3 -t Rust
+java -jar /home/rijeun/reo/bin/reo-1.0.jar /home/rijeun/bench/treo/treo/$proto.treo -p P:int=$2 C:int=$3 -t Rust
 
 if [[ "$rewrite" = true ]]; then
-  python3 ~/bench/treo/nseqscript.py $proto
+  python3 /home/rijeun/bench/treo/nseqscript.py $proto
 fi
 
-~/bench/rstosh $proto.rs
+/home/rijeun/bench/rstosh $proto.rs
 
 make
 
-cd ~/bench/tests
+cd /home/rijeun/bench/tests

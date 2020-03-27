@@ -1,0 +1,24 @@
+EARLY ASYNC REPLICATOR
+SIZES: 4,16,64,256,512
+
+ear 1 10000 4 10000
+size: 4, actions: 10000
+average C time over 10 runs: 0.18632519999999997
+average treo time over 10 runs: 0.03228314
+ear 1 10000 16 10000
+size: 16, actions: 10000
+average C time over 10 runs: 0.673219
+average treo time over 10 runs: 1.4354539999999998
+ear 1 10000 64 10000
+size: 64, actions: 10000
+average C time over 10 runs: 1.7415759999999998
+average treo time over 10 runs: 28.790880000000005
+ear 1 10000 256 10000
+size: 256, actions: 10000
+average C time over 10 runs: 4.423539
+average treo time over 10 runs: 156.3336
+ear 1 10000 512 10000
+size: 512, actions: 10000
+average C time over 10 runs: 7.927638
+average treo time over 10 runs: 355.2435
+
