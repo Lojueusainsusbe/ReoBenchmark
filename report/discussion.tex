@@ -1,0 +1,7 @@
+The C Alternator performs comparable to the Reo implementation at size 4. Our C Early Out Async Sequencer starts out slightly slower but eventually performs better than the Reo version. It should be noted that the results for the Alternator and Early Async Out Sequencer in graph \{tab:res} are probably not representative of their true performance due to the limited amount of data.\\\\
+%
+We can be more confident in the results from the Sequencer and Early Async Replicator in Figure \ref{grf:res2}. \\
+Our C Sequencer starts out performing slightly worse than the Reo implementation, but clearly overtakes it when size increases. From our, admittedly limited, number of data points we see that out C implementation scales linearly up until 512 consumers, whereas the Reo implementation seems to scale exponentially.\\
+The Reo Early Async Replicator is clearly beaten by the C implementation. While both seem to have a near linear scaling, the C implementation scales much better.\\\\
+%
+It can be seen that Reo outperforms our C implementations at very low sizes quite consistently. As the size increases, Reo seems to lose its advantage and scales more poorly than C. Depending on the specific protocol, our C implementations start outperforming their Reo counterparts at different sizes, but eventually all Reo protocols are overtaken.
