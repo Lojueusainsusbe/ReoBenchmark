@@ -2,7 +2,6 @@
 We consider four protocols with different types of behaviour. This section will describe these protocols and provide a specification of their behaviour using both reo circuits \cite{puff} and timed-data-stream semantics \cite{datastream}.
 
 \subsection{Sequencer}%
-\begin{minipage}{.65\textwidth}
   This protocol ensures that N producers fire in a cyclic sequence.\\\\
   %
   It has the following data stream semantics:\\\\
@@ -12,13 +11,13 @@ We consider four protocols with different types of behaviour. This section will 
   \vspace{0.2cm}\hphantom \qquad  \alpha_0(0) < \alpha_1(0) < ... < \alpha_{\textbf{N}-1}(0) < \alpha_0(1) \\
   \hphantom \qquad \sequencer(\langle \alpha_0', a_0' \rangle, \langle \alpha_1', a_1' \rangle,\;...\; \langle \alpha_{N-1}', a_{\textbf{N}-1}' \rangle)
   $
-\end{minipage}\hfill
-\begin{minipage}{.25\textwidth}
+  \begin{figure}[H]
+      \begin{center}
   \includegraphics[width=5cm]{img/seq.png}
-\end{minipage}
+\end{center}
+  \end{figure}
 
 \subsection{Alternator}
-\begin{minipage}{.65\textwidth}
   This protocol waits for all N inputs to put and the one output to get, after which the data of the first producer is instantly consumed.
   All the other producers have their output buffered, and consumed one by one in a set order.
   Only after all data has been consumed, may the producers fire again.\\\\
@@ -32,14 +31,12 @@ We consider four protocols with different types of behaviour. This section will 
   \vspace{0.2cm} \hphantom \qquad\forall 0 \leq i < \textbf{N} :\quad b(i) = a_i(0) \\
   \hphantom \qquad \alternator (\langle \alpha_0', a_0' \rangle, \langle \alpha_1', a_1' \rangle,\;...\; \langle \alpha_{N-1}', a_{N-1}' \rangle; \langle \beta(\textbf{N},\;...), b(\textbf{N},\;...) \rangle)
   $
-
-\end{minipage}\hfill
-\begin{minipage}{.25\textwidth}
+\begin{figure}[H]
+    \begin{center}
   \includegraphics[width=4cm]{img/alt.png}
-\end{minipage}
-
+\end{center}
+\end{figure}
 \subsection{Early Async Replicator}
-\begin{minipage}{.65\textwidth}
   This protocol has one producer, whose data is buffered when put, and $N$ consumers, which all replicate the producers data.
   All consumers fire simultaneously, but strictly after the producer.\\\\
   %
@@ -49,24 +46,24 @@ We consider four protocols with different types of behaviour. This section will 
   \vspace{0.2cm}\earep (\langle \alpha, a \rangle ; \langle \beta_0, b_0 \rangle, \langle \beta_1, b_1 \rangle,\; ... \; \langle \beta_{\textbf{N}-1}, b_{\textbf{N}-1} \rangle) \equiv \\
   \vspace{0.2cm} \hphantom \qquad \forall 0 \leq i < \textbf{N} : \quad \alpha(0) < \beta_i(0) < \alpha(1) \land a(0) = b_i(0) \\
   \hphantom \qquad\forall 0 \leq i < \textbf{N}-1 :\quad \beta_i(0) = \beta_{i+1}(0)
-  $
-\end{minipage}\hfill
-\begin{minipage}{.25\textwidth}
-  \includegraphics[width=5cm]{img/EARep.png}\\
-\end{minipage}
-
+  $ \\
+  \begin{figure}[H]
+      \begin{center}
+  \includegraphics[width=5cm]{img/EARep.png}
+\end{center}
+ \end{figure}
 \subsection{Early Async Out Sequencer}
-\begin{minipage}{.65\textwidth}
   Given one producer and multiple consumers, this protocol saves a production to a buffer and then directs it to one consumer. The consumers fire in a set order.\\\\
   %
   It has the following data stream semantics:\\\\
   %
   $
-  \vspace{0.2cm}\eaoseq (\langle \alpha, a \rangle;\langle \beta_0, b_0 \rangle, \langle \beta_1, b_1 \rangle,\;...\; \langle \beta_{\textbf{N}-1}, b_{\textbf{N}-1} \rangle) \equiv
+  \vspace{0.2cm}\eaoseq (\langle \alpha, a \rangle;\langle \beta_0, b_0 \rangle, \langle \beta_1, b_1 \rangle,\;...\; \langle \beta_{\textbf{N}-1}, b_{\textbf{N}-1} \rangle) \equiv \\
   \vspace{0.2cm} \hphantom \qquad \alpha(0) < \beta_0(0) < \alpha(1) \land a(0) = b_0(0) \\
   \hphantom \qquad \eaoseq (\langle \alpha', a' \rangle; \langle \beta_1, b_1 \rangle,\langle \beta_2, b_2 \rangle,\;...\; \langle \beta_{\textbf{N}-1}, b_{\textbf{N}-1} \rangle, \langle \beta_0', b_0' \rangle)
   $
-\end{minipage}\hspace{0.05cm}
-\begin{minipage}{.25\textwidth}
-  \includegraphics[width=7cm]{img/eaoseq.png}\\
-\end{minipage}
+  \begin{figure}[H]
+      \begin{center}
+  \includegraphics[width=7cm]{img/eaoseq.png}
+\end{center}
+  \end{figure}
